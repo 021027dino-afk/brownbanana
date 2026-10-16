@@ -19,6 +19,8 @@ Claude Code 세션 구성(스킬 + 플러그인)을 보관하는 저장소입니
 - code-review, code-simplifier, commit-commands, feature-dev, hookify, plugin-dev, pr-review-toolkit, security-guidance, skill-creator
 - humanize-korean (한국어 AI 티 제거)
 
+클라우드 세션에서는 SessionStart 훅(`.claude/hooks/session-start.sh`)이 `settings.json`에 선언된 마켓플레이스를 등록하고, 빠진 플러그인을 설치합니다. 서드파티 마켓플레이스(`im-not-ai`)는 자동 등록되지 않아서 훅이 필요합니다.
+
 ## 원칙
 
 기능이 겹치는 스킬·플러그인은 설치하지 않습니다.

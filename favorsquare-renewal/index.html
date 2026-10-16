@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>favor square</title>
+<meta name="description" content="매일 손이 가는 것만 골라 파는 favor square. 브로멜라인 토너, 딜라잇 단백질쉐이크, 타올, 우산.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #F6F7F5;
+    --ink: #20302A;
+    --ink-soft: #4A5A53;
+    --line: #D5DBD7;
+    --pineapple: #F2C230;
+    --cocoa: #6B3F2A;
+    --cotton: #DDE8E0;
+    --rain: #3F6FB5;
+    --white: #FFFFFF;
+    --sale: #B4361F;
+
+    --f-display: "Hahmlet", "Noto Serif KR", serif;
+    --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+
+    --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px;
+    --s-6: 32px; --s-7: 48px; --s-8: 72px; --s-9: 112px;
+
+    --max: 1200px;
+    --gutter: clamp(16px, 4vw, 40px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  img, svg { display: block; max-width: 100%; }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--rain); outline-offset: 3px; border-radius: 2px; }
+
+  h1, h2, h3, blockquote { text-wrap: balance; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+
+  /* 헤더 */
+  .site-header {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-row { display: flex; align-items: center; gap: var(--s-5); height: 64px; }
+  .wordmark {
+    font-family: var(--f-display); font-weight: 800; font-size: 22px;
+    letter-spacing: -0.02em; text-decoration: none; display: flex; align-items: center; gap: 10px;
+  }
+  .wordmark-mark { display: grid; grid-template-columns: repeat(2, 9px); gap: 2px; }
+  .wordmark-mark i { width: 9px; height: 9px; display: block; }
+  .wordmark-mark i:nth-child(1) { background: var(--pineapple); }
+  .wordmark-mark i:nth-child(2) { background: var(--cocoa); }
+  .wordmark-mark i:nth-child(3) { background: var(--cotton); outline: 1px solid var(--line); outline-offset: -1px; }
+  .wordmark-mark i:nth-child(4) { background: var(--rain); }
+
+  .nav { display: flex; gap: var(--s-1); margin-left: var(--s-4); }
+  .nav a {
+    text-decoration: none; font-weight: 500; font-size: 15px;
+    padding: 10px 12px; border-radius: 6px; color: var(--ink-soft);
+  }
+  .nav a:hover, .nav a[aria-current="page"] { color: var(--ink); background: var(--white); }
+  .header-actions { margin-left: auto; display: flex; gap: var(--s-1); }
+  .icon-btn {
+    width: 44px; height: 44px; display: grid; place-items: center;
+    background: none; border: 0; border-radius: 8px; position: relative;
+  }
+  .icon-btn:hover { background: var(--white); }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .cart-count {
+    position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px;
+    border-radius: 9px; background: var(--ink); color: var(--white);
+    font-size: 11px; font-weight: 600; line-height: 18px; text-align: center;
+  }
+  .cart-count[data-empty="true"] { display: none; }
+  .menu-btn { display: none; }
+
+  /* 히어로 */
+  .hero { padding: var(--s-8) 0 var(--s-9); }
+  .hero-grid {
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: var(--s-8); align-items: center;
+  }
+  .hero h1 {
+    font-family: var(--f-display); font-weight: 800;
+    font-size: clamp(38px, 5.4vw, 68px); line-height: 1.12; letter-spacing: -0.035em;
+    margin: 0 0 var(--s-5);
+  }
+  .hero-lede { font-size: 18px; color: var(--ink-soft); max-width: 30em; margin: 0 0 var(--s-6); }
+  .hero-ctas { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 52px;
+    padding: 0 var(--s-5); border-radius: 8px; font-weight: 600; text-decoration: none;
+    border: 1.5px solid var(--ink); transition: background-color .18s ease, color .18s ease;
+  }
+  .btn-solid { background: var(--ink); color: var(--white); }
+  .btn-solid:hover { background: #33473F; }
+  .btn-line { background: transparent; }
+  .btn-line:hover { background: var(--white); }
+
+  .day {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
+    list-style: none; margin: 0; padding: 0;
+  }
+  .day li { aspect-ratio: 1 / 1; }
+  .tile {
+    height: 100%; display: flex; flex-direction: column; justify-content: space-between;
+    padding: clamp(14px, 2vw, 24px); text-decoration: none; position: relative; overflow: hidden;
+  }
+  .tile time, .tile .when { font-weight: 600; font-size: 14px; }
+  .tile-art { width: 46%; align-self: flex-end; margin: -4% -2% 0 0; }
+  .tile-copy strong {
+    display: block; font-family: var(--f-display); font-weight: 700;
+    font-size: clamp(17px, 1.9vw, 23px); line-height: 1.25; letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .tile-copy span { font-size: 14px; }
+  .tile:hover .tile-art { transform: rotate(-4deg); }
+  .tile-art { transition: transform .3s ease; }
+  .t-toner { background: var(--pineapple); color: var(--ink); }
+  .t-shake { background: var(--cocoa); color: var(--white); }
+  .t-towel { background: var(--cotton); color: var(--ink); }
+  .t-umbrella { background: var(--rain); color: var(--white); }
+
+  /* 섹션 공통 */
+  .section { padding: var(--s-9) 0; border-top: 1px solid var(--line); }
+  .section-head { display: flex; align-items: end; justify-content: space-between; gap: var(--s-5); margin-bottom: var(--s-7); }
+  .section h2 {
+    font-family: var(--f-display); font-weight: 800; letter-spacing: -0.03em;
+    font-size: clamp(28px, 3.4vw, 42px); line-height: 1.2; margin: 0;
+  }
+  .section-head p { margin: var(--s-3) 0 0; color: var(--ink-soft); max-width: 34em; }
+  .text-link { font-weight: 600; text-underline-offset: 4px; white-space: nowrap; padding: 10px 0; }
+
+  /* 대표 상품: 쉐이크 */
+  .feature {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    background: var(--white); border: 1px solid var(--line); border-radius: 4px; overflow: hidden;
+  }
+  .feature-visual {
+    background: var(--cocoa); display: grid; place-items: center; padding: var(--s-7);
+    transition: background-color .35s ease; min-height: 420px;
+  }
+  .feature-visual[data-flavor="grain"] { background: #C9B48E; }
+  .feature-visual svg { width: min(62%, 300px); }
+  .feature-body { padding: clamp(24px, 4vw, 56px); display: flex; flex-direction: column; gap: var(--s-5); }
+  .feature-body h3 {
+    font-family: var(--f-display); font-weight: 800; font-size: clamp(26px, 2.8vw, 34px);
+    letter-spacing: -0.03em; line-height: 1.2; margin: 0;
+  }
+  .feature-body > p { margin: 0; color: var(--ink-soft); }
+  .flavors { border: 0; margin: 0; padding: 0; }
+  .flavors legend { font-weight: 600; margin-bottom: var(--s-3); }
+  .flavor-opts { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+  .flavor-opts label {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 18px;
+    border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 500;
+  }
+  .flavor-opts input { position: absolute; opacity: 0; pointer-events: none; }
+  .flavor-opts .swatch { width: 14px; height: 14px; border-radius: 50%; }
+  .flavor-opts label:has(input:checked) { border-color: var(--ink); background: var(--paper); }
+  .flavor-opts label:has(input:focus-visible) { outline: 3px solid var(--rain); outline-offset: 2px; }
+  .quote-line {
+    margin: 0; padding-left: var(--s-4); border-left: 3px solid var(--pineapple);
+    font-size: 15px; color: var(--ink-soft);
+  }
+  .buy-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); flex-wrap: wrap; margin-top: auto; }
+  .price { font-family: var(--f-display); font-weight: 800; font-size: 28px; letter-spacing: -0.02em; }
+  .price small { font-family: var(--f-body); font-size: 15px; font-weight: 500; }
+
+  /* 상품 목록 */
+  .filters { display: flex; gap: var(--s-2); flex-wrap: wrap; margin-bottom: var(--s-6); }
+  .filters button {
+    min-height: 44px; padding: 0 18px; border-radius: 22px; border: 1.5px solid var(--line);
+    background: transparent; font-weight: 500;
+  }
+  .filters button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--white); }
+  .products {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-7) var(--s-5);
+    list-style: none; margin: 0; padding: 0;
+  }
+  .product[hidden] { display: none; }
+  .product a { text-decoration: none; display: block; }
+  .product-img { aspect-ratio: 1 / 1; display: grid; place-items: center; margin-bottom: var(--s-4); }
+  .product-img svg { width: 48%; transition: transform .3s ease; }
+  .product a:hover .product-img svg { transform: scale(1.05); }
+  .product h3 { font-size: 16px; font-weight: 600; margin: 0 0 var(--s-1); line-height: 1.45; }
+  .product .meta { font-size: 14px; color: var(--ink-soft); margin: 0 0 var(--s-2); }
+  .product .cost { font-weight: 600; font-size: 16px; }
+  .product .cost s { color: var(--ink-soft); font-weight: 400; font-size: 14px; margin-left: 6px; }
+  .product .cost .off { color: var(--sale); margin-right: 6px; }
+  .product .cost.pending { color: var(--ink-soft); font-weight: 500; border-bottom: 1px dashed var(--ink-soft); }
+
+  /* 후기 */
+  .reviews {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5);
+    list-style: none; margin: 0; padding: 0;
+  }
+  .reviews > li { display: flex; }
+  .reviews > li:first-child { grid-row: span 2; }
+  .review {
+    flex: 1; margin: 0;
+    background: var(--white); border: 1px solid var(--line); border-radius: 4px;
+    padding: var(--s-6); display: flex; flex-direction: column; gap: var(--s-4);
+  }
+  .reviews > li:first-child .review { background: var(--pineapple); border-color: var(--pineapple); }
+  .reviews > li:first-child blockquote { font-size: clamp(24px, 2.6vw, 34px); }
+  .review blockquote {
+    margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 20px;
+    line-height: 1.4; letter-spacing: -0.02em;
+  }
+  .review figcaption { margin-top: auto; font-size: 14px; color: var(--ink-soft); }
+  .reviews > li:first-child figcaption { color: var(--ink); }
+
+  /* 안내 */
+  .promise { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); margin: 0; }
+  .promise div { border-top: 2px solid var(--ink); padding-top: var(--s-4); }
+  .promise dt { font-weight: 600; font-size: 17px; margin-bottom: var(--s-2); }
+  .promise dd { margin: 0; color: var(--ink-soft); }
+
+  /* 푸터 */
+  .site-footer { background: var(--ink); color: #D9E1DC; padding: var(--s-8) 0 var(--s-7); font-size: 14px; }
+  .site-footer .wordmark { color: var(--white); margin-bottom: var(--s-5); }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--s-6); }
+  .site-footer h2 { font-size: 15px; color: var(--white); margin: 0 0 var(--s-3); font-weight: 600; }
+  .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+  .site-footer a { text-decoration: none; }
+  .site-footer a:hover { text-decoration: underline; }
+  .biz { line-height: 1.9; margin: 0; }
+  .todo { border-bottom: 1px dashed currentColor; }
+
+  /* 토스트 */
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0;
+    background: var(--ink); color: var(--white); padding: 14px 20px; border-radius: 8px;
+    font-weight: 500; pointer-events: none; transition: opacity .2s ease, transform .2s ease; z-index: 50;
+    max-width: calc(100% - 32px);
+  }
+  .toast[data-show="true"] { opacity: 1; transform: translate(-50%, 0); }
+
+  /* 첫 화면 연출: 타일이 하루 순서대로 놓임 */
+  @media (prefers-reduced-motion: no-preference) {
+    .day li { animation: place .5s cubic-bezier(.2, .8, .2, 1) both; }
+    .day li:nth-child(1) { animation-delay: .05s; }
+    .day li:nth-child(2) { animation-delay: .17s; }
+    .day li:nth-child(3) { animation-delay: .29s; }
+    .day li:nth-child(4) { animation-delay: .41s; }
+    @keyframes place { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+
+  /* 반응형 */
+  @media (max-width: 960px) {
+    .hero-grid { grid-template-columns: 1fr; gap: var(--s-7); }
+    .products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .reviews { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .reviews > li:first-child { grid-row: auto; grid-column: 1 / -1; }
+    .feature { grid-template-columns: 1fr; }
+    .feature-visual { min-height: 300px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid > :first-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 760px) {
+    .nav {
+      display: none; position: absolute; top: 64px; left: 0; right: 0; margin: 0;
+      flex-direction: column; background: var(--paper); border-bottom: 1px solid var(--line);
+      padding: var(--s-2) var(--gutter) var(--s-4);
+    }
+    .nav[data-open="true"] { display: flex; }
+    .nav a { padding: 14px 12px; font-size: 16px; }
+    .menu-btn { display: grid; }
+    .hero { padding: var(--s-7) 0 var(--s-8); }
+    .section { padding: var(--s-8) 0; }
+    .section-head { flex-direction: column; align-items: start; }
+    .promise { grid-template-columns: 1fr; }
+    .reviews { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 420px) {
+    .day { gap: 6px; }
+    .tile-copy span { display: none; }
+    .products { gap: var(--s-5) var(--s-3); }
+  }
+</style>
+</head>
+<body>
+
+<!-- 상품 그림: 실제 상품 사진이 준비되면 교체 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-toner" viewBox="0 0 100 140">
+    <rect x="38" y="6" width="24" height="12" rx="2" fill="currentColor"/>
+    <rect x="44" y="18" width="12" height="10" fill="currentColor"/>
+    <path d="M30 6h8v8h-14z" fill="currentColor"/>
+    <rect x="22" y="28" width="56" height="106" rx="10" fill="none" stroke="currentColor" stroke-width="5"/>
+    <rect x="34" y="62" width="32" height="40" rx="3" fill="currentColor" opacity=".18"/>
+    <path d="M42 70l8 6 8-6M50 76v18" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-shake" viewBox="0 0 100 140">
+    <rect x="30" y="4" width="40" height="16" rx="4" fill="currentColor"/>
+    <path d="M24 26h52l-6 108H30z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M27 70h46l-3.5 61h-39z" fill="currentColor" opacity=".25"/>
+    <path d="M34 46h32" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-towel" viewBox="0 0 120 120">
+    <rect x="16" y="70" width="88" height="26" rx="8" fill="none" stroke="currentColor" stroke-width="5"/>
+    <rect x="22" y="40" width="76" height="26" rx="8" fill="none" stroke="currentColor" stroke-width="5"/>
+    <path d="M22 53h76" stroke="currentColor" stroke-width="3" opacity=".5"/>
+    <path d="M16 83h88" stroke="currentColor" stroke-width="3" opacity=".5"/>
+    <path d="M30 40c0-10 6-16 16-16" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+  </symbol>
+  <symbol id="i-umbrella" viewBox="0 0 120 130">
+    <path d="M10 62C10 34 32 12 60 12s50 22 50 50c-8-7-17-7-25 0-8-7-17-7-25 0-8-7-17-7-25 0-8-7-17-7-25 0z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M60 12v98c0 8-5 12-11 12s-10-4-10-10" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+    <path d="M60 12c-12 14-15 32-15 50M60 12c12 14 15 32 15 50" fill="none" stroke="currentColor" stroke-width="3" opacity=".6"/>
+  </symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="wordmark" href="#top" aria-label="favor square 홈">
+      <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      favor square
+    </a>
+    <nav class="nav" id="site-nav" aria-label="주요 메뉴">
+      <a href="#products" aria-current="page">전체</a>
+      <a href="#products" data-go="home">HOME</a>
+      <a href="#products" data-go="living">LIVING</a>
+      <a href="#reviews">후기</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" type="button" aria-label="검색"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+      <button class="icon-btn" type="button" aria-label="장바구니, 0개 담김" id="cart-btn">
+        <svg aria-hidden="true"><use href="#i-bag"/></svg>
+        <span class="cart-count" id="cart-count" data-empty="true" aria-hidden="true">0</span>
+      </button>
+      <button class="icon-btn menu-btn" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="site-nav" id="menu-btn">
+        <svg aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero-grid">
+      <div>
+        <h1 id="hero-title">하루를 조금 편하게 하는 물건들</h1>
+        <p class="hero-lede">favor square는 매일 손이 가는 것만 골라서 팝니다. 세안 후 뿌리는 토너부터 비 오는 퇴근길의 우산까지, 하루 순서대로 담았어요.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-solid" href="#products">전체 상품 보기</a>
+          <a class="btn btn-line" href="#reviews">구매 후기 읽기</a>
+        </div>
+      </div>
+
+      <ol class="day" aria-label="하루 순서로 보는 상품">
+        <li>
+          <a class="tile t-toner" href="#p-toner">
+            <time>오전 7:30</time>
+            <svg class="tile-art" aria-hidden="true"><use href="#i-toner"/></svg>
+            <span class="tile-copy"><strong>세안하고 바로 칙칙</strong><span>브로멜라인 토너</span></span>
+          </a>
+        </li>
+        <li>
+          <a class="tile t-shake" href="#shake">
+            <time>오후 12:40</time>
+            <svg class="tile-art" aria-hidden="true"><use href="#i-shake"/></svg>
+            <span class="tile-copy"><strong>점심 못 챙긴 날</strong><span>딜라잇 단백질쉐이크</span></span>
+          </a>
+        </li>
+        <li>
+          <a class="tile t-towel" href="#p-sports-towel">
+            <time>오후 7:10</time>
+            <svg class="tile-art" aria-hidden="true"><use href="#i-towel"/></svg>
+            <span class="tile-copy"><strong>운동 끝나고 땀 닦을 때</strong><span>스포츠 타올</span></span>
+          </a>
+        </li>
+        <li>
+          <a class="tile t-umbrella" href="#p-umbrella">
+            <span class="when">비 오는 날</span>
+            <svg class="tile-art" aria-hidden="true"><use href="#i-umbrella"/></svg>
+            <span class="tile-copy"><strong>갑자기 비 오는 퇴근길</strong><span>우산</span></span>
+          </a>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="shake" aria-labelledby="shake-title">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2 id="shake-title">favor square의 대표 상품</h2>
+          <p>맛은 두 가지예요. 초코텔라맛은 자주 품절돼요.</p>
+        </div>
+      </div>
+
+      <article class="feature">
+        <div class="feature-visual" id="shake-visual" data-flavor="choco">
+          <svg aria-hidden="true" style="color:var(--white)"><use href="#i-shake"/></svg>
+        </div>
+        <div class="feature-body">
+          <h3>딜라잇 단백질쉐이크</h3>
+          <p>끼니를 거르기 쉬운 날 가방에 넣어 다니는 쉐이크예요. 물에 타도 맛이 묽지 않아요.</p>
+
+          <fieldset class="flavors">
+            <legend>맛 고르기</legend>
+            <div class="flavor-opts">
+              <label><input type="radio" name="flavor" value="choco" checked><span class="swatch" style="background:var(--cocoa)"></span>초코텔라맛</label>
+              <label><input type="radio" name="flavor" value="grain"><span class="swatch" style="background:#C9B48E"></span>곡물맛</label>
+            </div>
+          </fieldset>
+
+          <p class="quote-line" id="flavor-quote">초코텔라맛 후기: “초코맛 아주 요물이에요”</p>
+
+          <div class="buy-row">
+            <span class="price">24,500<small>원</small></span>
+            <button class="btn btn-solid" type="button" data-add="딜라잇 단백질쉐이크" id="shake-add">초코텔라맛 장바구니에 담기</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="products" aria-labelledby="products-title">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2 id="products-title">전체 상품</h2>
+          <p>몇 가지만 팝니다. 대신 하나씩 오래 써 보고 골랐어요.</p>
+        </div>
+      </div>
+
+      <div class="filters" role="group" aria-label="카테고리">
+        <button type="button" data-filter="all" aria-pressed="true">전체</button>
+        <button type="button" data-filter="home" aria-pressed="false">HOME</button>
+        <button type="button" data-filter="living" aria-pressed="false">LIVING</button>
+      </div>
+
+      <ul class="products" id="product-list">
+        <li class="product" data-cat="living" id="p-shake">
+          <a href="#shake">
+            <div class="product-img" style="background:var(--cocoa);color:var(--white)"><svg aria-hidden="true"><use href="#i-shake"/></svg></div>
+            <h3>딜라잇 단백질쉐이크 초코텔라맛</h3>
+            <p class="meta">자주 품절되는 맛</p>
+            <p class="cost">24,500원</p>
+          </a>
+        </li>
+        <li class="product" data-cat="living">
+          <a href="#shake">
+            <div class="product-img" style="background:#C9B48E"><svg aria-hidden="true"><use href="#i-shake"/></svg></div>
+            <h3>딜라잇 단백질쉐이크 곡물맛</h3>
+            <p class="meta">곡물맛을 안 좋아해도 먹기 편한 맛</p>
+            <p class="cost">24,500원</p>
+          </a>
+        </li>
+        <li class="product" data-cat="living" id="p-toner">
+          <a href="#p-toner">
+            <div class="product-img" style="background:var(--pineapple)"><svg aria-hidden="true"><use href="#i-toner"/></svg></div>
+            <h3>브로멜라인 토너</h3>
+            <p class="meta">뿌리는 스프레이형, 토너팩도 돼요</p>
+            <p class="cost"><span class="off">18%</span>27,900원<s>34,000원</s></p>
+          </a>
+        </li>
+        <li class="product" data-cat="home">
+          <a href="#products">
+            <div class="product-img" style="background:var(--cotton)"><svg aria-hidden="true"><use href="#i-towel"/></svg></div>
+            <h3>페이스 타올</h3>
+            <p class="meta">세안 후 한 장</p>
+            <p class="cost pending">가격 입력 필요</p>
+          </a>
+        </li>
+        <li class="product" data-cat="home" id="p-sports-towel">
+          <a href="#p-sports-towel">
+            <div class="product-img" style="background:#C3D6C9"><svg aria-hidden="true"><use href="#i-towel"/></svg></div>
+            <h3>스포츠 타올</h3>
+            <p class="meta">운동 가방에 하나</p>
+            <p class="cost pending">가격 입력 필요</p>
+          </a>
+        </li>
+        <li class="product" data-cat="living" id="p-umbrella">
+          <a href="#p-umbrella">
+            <div class="product-img" style="background:var(--rain);color:var(--white)"><svg aria-hidden="true"><use href="#i-umbrella"/></svg></div>
+            <h3>우산</h3>
+            <p class="meta">가방에 넣어 두는 우산</p>
+            <p class="cost pending">가격 입력 필요</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="reviews" aria-labelledby="reviews-title">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2 id="reviews-title">써 본 분들이 남긴 말</h2>
+          <p>favor square 후기 게시판에 올라온 글에서 옮겼어요.</p>
+        </div>
+        <a class="text-link" href="#reviews">후기 전체 보기</a>
+      </div>
+
+      <ul class="reviews">
+        <li><figure class="review">
+          <blockquote>몇통째인지 모르겠어요. 진짜 체감상 좋다 느낀 토너 처음임 ㅠㅠ</blockquote>
+          <figcaption>브로멜라인 토너 구매 후기</figcaption>
+        </figure></li>
+        <li><figure class="review">
+          <blockquote>곡물맛 안 먹는 나도 먹게 한 쉐이크</blockquote>
+          <figcaption>딜라잇 단백질쉐이크 곡물맛 구매 후기</figcaption>
+        </figure></li>
+        <li><figure class="review">
+          <blockquote>고급진 초코맛</blockquote>
+          <figcaption>딜라잇 단백질쉐이크 초코텔라맛 구매 후기</figcaption>
+        </figure></li>
+        <li><figure class="review">
+          <blockquote>촉촉하고 스프레이 타입이라 편하고 토너팩해도 좋더라구요</blockquote>
+          <figcaption>브로멜라인 토너 구매 후기</figcaption>
+        </figure></li>
+        <li><figure class="review">
+          <blockquote>늘 먹던 제품인데 저렴하게 잘 샀어요</blockquote>
+          <figcaption>딜라잇 단백질쉐이크 구매 후기</figcaption>
+        </figure></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="promise-title">
+    <div class="wrap">
+      <h2 id="promise-title" class="visually-hidden">주문 안내</h2>
+      <dl class="promise">
+        <div><dt>배송</dt><dd><span class="todo">배송 기간과 무료배송 기준 입력</span></dd></div>
+        <div><dt>교환과 반품</dt><dd><span class="todo">교환·반품 기준 입력</span></dd></div>
+        <div><dt>문의</dt><dd><span class="todo">고객센터 운영 시간과 연락처 입력</span></dd></div>
+      </dl>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>
+      <a class="wordmark" href="#top">
+        <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        favor square
+      </a>
+      <p class="biz">
+        주식회사 해시태그우디<br>
+        대표 <span class="todo">입력</span> | 사업자등록번호 <span class="todo">입력</span><br>
+        통신판매업신고 <span class="todo">입력</span><br>
+        주소 <span class="todo">인천 소재지 입력</span><br>
+        개인정보보호책임자 <span class="todo">입력</span>
+      </p>
+    </div>
+    <div>
+      <h2>쇼핑</h2>
+      <ul>
+        <li><a href="#products">전체 상품</a></li>
+        <li><a href="#reviews">구매 후기</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>안내</h2>
+      <ul>
+        <li><a href="#top">이용약관</a></li>
+        <li><a href="#top">개인정보처리방침</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  (function () {
+    var flavors = {
+      choco: { name: '초코텔라맛', quote: '초코텔라맛 후기: “초코맛 아주 요물이에요”' },
+      grain: { name: '곡물맛', quote: '곡물맛 후기: “곡물맛 안 먹는 나도 먹게 한 쉐이크”' }
+    };
+    var visual = document.getElementById('shake-visual');
+    var quote = document.getElementById('flavor-quote');
+    var addBtn = document.getElementById('shake-add');
+    document.querySelectorAll('input[name="flavor"]').forEach(function (input) {
+      input.addEventListener('change', function () {
+        var f = flavors[input.value];
+        visual.dataset.flavor = input.value;
+        quote.textContent = f.quote;
+        addBtn.textContent = f.name + ' 장바구니에 담기';
+      });
+    });
+
+    var count = 0;
+    var countEl = document.getElementById('cart-count');
+    var cartBtn = document.getElementById('cart-btn');
+    var toast = document.getElementById('toast');
+    var timer;
+    addBtn.addEventListener('click', function () {
+      var flavor = document.querySelector('input[name="flavor"]:checked').value;
+      count += 1;
+      countEl.textContent = count;
+      countEl.dataset.empty = 'false';
+      cartBtn.setAttribute('aria-label', '장바구니, ' + count + '개 담김');
+      toast.textContent = '딜라잇 단백질쉐이크 ' + flavors[flavor].name + '을 장바구니에 담았어요';
+      toast.dataset.show = 'true';
+      clearTimeout(timer);
+      timer = setTimeout(function () { toast.dataset.show = 'false'; }, 2400);
+    });
+
+    var filterBtns = document.querySelectorAll('[data-filter]');
+    function applyFilter(cat) {
+      filterBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.filter === cat)); });
+      document.querySelectorAll('#product-list .product').forEach(function (p) {
+        p.hidden = cat !== 'all' && p.dataset.cat !== cat;
+      });
+    }
+    filterBtns.forEach(function (b) { b.addEventListener('click', function () { applyFilter(b.dataset.filter); }); });
+    document.querySelectorAll('[data-go]').forEach(function (a) {
+      a.addEventListener('click', function () { applyFilter(a.dataset.go); closeMenu(); });
+    });
+
+    var menuBtn = document.getElementById('menu-btn');
+    var nav = document.getElementById('site-nav');
+    function closeMenu() {
+      nav.dataset.open = 'false';
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute('aria-label', '메뉴 열기');
+    }
+    menuBtn.addEventListener('click', function () {
+      var open = nav.dataset.open !== 'true';
+      nav.dataset.open = String(open);
+      menuBtn.setAttribute('aria-expanded', String(open));
+      menuBtn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    });
+    nav.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  })();
+</script>
+</body>
+</html>

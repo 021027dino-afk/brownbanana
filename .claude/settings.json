@@ -9,8 +9,7 @@
     "skill-creator@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
-    "humanize-korean@im-not-ai": true,
-    "lemo-opuscar@lemolab": true
+    "humanize-korean@im-not-ai": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -23,12 +22,6 @@
       "source": {
         "source": "github",
         "repo": "epoko77-ai/im-not-ai"
-      }
-    },
-    "lemolab": {
-      "source": {
-        "source": "github",
-        "repo": "lemomo-ai/lemo-opuscar"
       }
     }
   }

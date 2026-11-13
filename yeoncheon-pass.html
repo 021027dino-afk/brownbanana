@@ -203,10 +203,19 @@ footer{border-top:1px solid var(--line);margin-top:56px;padding-top:16px;font-si
 
 .js-motion .rv{opacity:0}
 @media print{
-  body{background:#fff}nav.toc,#progress,.ctl{display:none}.shell{display:block}
-  .rv{opacity:1!important;transform:none!important}details .a{display:block}
-  .bar .tr i,.steps3 .b,.stack i,td .mini i,.goalc .tr i{transform:none!important}
-  section{break-inside:avoid-page}.tw{break-inside:avoid}
+  body{background:#fff}nav.toc,#progress,.ctl{display:none}.shell{display:block;padding:0 4px}
+  .rv{opacity:1!important;transform:none!important}
+  section{padding-top:34px}
+  .hero{padding:10px 0 0}
+  h2,h3{break-after:avoid}
+  .kpi,.cause div,.goalc,.card,details,.flow .s,.phase .p,.compare .r,.note,.formula,.bar,tr,.legend{break-inside:avoid}
+  thead{display:table-header-group}
+  .kpis.g3{grid-template-columns:repeat(3,1fr)}.kpis.g4{grid-template-columns:repeat(4,1fr)}
+  .cause{grid-template-columns:repeat(3,1fr)}.goal{grid-template-columns:1fr 1fr}
+  .flow{grid-template-columns:repeat(4,1fr)}.phase{grid-template-columns:repeat(4,1fr)}
+  details .a{display:block}
+  .tw{overflow:visible}table{min-width:0!important}
+  footer{display:none}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>연천(連天) 패스 정책 제안서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script>if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('js-motion');</script>
+<style>
+:root{
+  --bg:#F6F4EE; --paper:#FFFFFF; --ink:#1B1F1E; --muted:#5B6663; --line:#E2DED3;
+  --accent:#0B5D57; --accent-2:#2E8F85; --accent-soft:#DDEDEA;
+  --amber:#B7791F; --amber-soft:#F7EBD2; --red:#B4412F; --red-soft:#F6DED9;
+  --r1:#E3F0EE; --r2:#A9D3CD; --r3:#0B5D57;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;line-height:1.7;word-break:keep-all;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:3px}
+.num,.mono{font-family:'IBM Plex Mono','Noto Sans KR',monospace;font-variant-numeric:tabular-nums}
+#progress{position:fixed;top:0;left:0;height:3px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:0 50%;z-index:50}
+
+/* layout */
+.shell{max-width:1180px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:200px 1fr;gap:48px}
+nav.toc{position:sticky;top:24px;align-self:start;padding-top:64px;font-size:13px}
+nav.toc b{display:block;font-size:11px;letter-spacing:.12em;color:var(--muted);margin-bottom:10px}
+nav.toc a{display:block;padding:5px 0 5px 12px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none;transition:color .2s,border-color .2s}
+nav.toc a.on{color:var(--accent);border-color:var(--accent);font-weight:700}
+main{min-width:0;padding-bottom:96px}
+@media(max-width:980px){.shell{grid-template-columns:1fr;gap:0}nav.toc{display:none}}
+
+/* hero */
+.hero{padding:64px 0 28px}
+.eyebrow{display:inline-flex;gap:8px;font-size:12px;color:var(--muted);align-items:center}
+.eyebrow i{width:8px;height:8px;background:var(--accent);display:inline-block}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.2;letter-spacing:-.02em;margin:12px 0 10px;font-weight:900}
+h1 small{font-weight:400;color:var(--muted);font-size:.5em;margin-left:6px}
+.meta{font-size:13px;color:var(--muted)}
+.meta span{background:#ECE8DD;padding:3px 10px;margin-right:6px}
+
+section{padding-top:56px}
+h2{font-size:26px;letter-spacing:-.01em;margin:0 0 6px;display:flex;align-items:baseline;gap:12px}
+h2 .n{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--accent);font-weight:600}
+h3{font-size:15px;margin:28px 0 10px;font-weight:700}
+h3.lab{font-size:11px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin:32px 0 10px}
+p{margin:10px 0}
+.lead{font-size:17px;line-height:1.8}
+.lead strong,.hl{background:linear-gradient(transparent 62%,var(--amber-soft) 62%)}
+
+/* cards & kpi */
+.card{background:var(--paper);border:1px solid var(--line);padding:22px}
+.kpis{display:grid;gap:14px;margin:22px 0}
+.kpis.g3{grid-template-columns:repeat(3,1fr)}
+.kpis.g4{grid-template-columns:repeat(4,1fr)}
+.kpis.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:760px){.kpis.g3,.kpis.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.kpis.g2,.kpis.g3,.kpis.g4{grid-template-columns:1fr}}
+.kpi{background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--accent);padding:16px 18px}
+.kpi.warn{border-top-color:var(--amber)}
+.kpi.dark{background:var(--accent);color:#fff;border-color:var(--accent)}
+.kpi .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.1;letter-spacing:-.02em}
+.kpi .v em{font-style:normal;font-size:.5em;margin-left:3px;font-family:'Noto Sans KR',sans-serif;font-weight:500}
+.kpi .t{font-size:13px;font-weight:700;margin-top:6px}
+.kpi .d{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.kpi.dark .d{color:#CFE7E3}
+
+/* bars */
+.bars{display:grid;gap:10px;margin:8px 0}
+.bar{display:grid;grid-template-columns:110px 1fr 64px;gap:12px;align-items:center;font-size:13px}
+.bar .tr{height:22px;background:#EDEAE0;position:relative;overflow:hidden}
+.bar .tr i{position:absolute;inset:0;background:var(--accent);transform-origin:0 50%;transform:scaleX(var(--w,0))}
+.bar.alt .tr i{background:var(--accent-2)}
+.bar.mute .tr i{background:#B9C4C1}
+.bar .val{text-align:right;font-weight:600}
+@media(max-width:520px){.bar{grid-template-columns:82px 1fr 52px;gap:8px}}
+
+/* decline chart */
+.steps3{display:flex;align-items:flex-end;gap:14px;height:150px;margin-top:10px}
+.steps3 .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.steps3 .b{width:100%;height:92px;background:var(--accent);transform-origin:50% 100%;transform:scaleY(var(--h,0));min-height:3px}
+.steps3 .col:nth-child(2) .b{background:var(--accent-2)}
+.steps3 .col:nth-child(3) .b{background:var(--red)}
+.steps3 .num{font-size:18px;font-weight:600}
+.steps3 small{font-size:11px;color:var(--muted)}
+
+/* compare */
+.compare{display:grid;gap:0;border:1px solid var(--line);background:var(--paper);margin:18px 0}
+.compare .h,.compare .r{display:grid;grid-template-columns:130px 1fr 1.25fr}
+.compare .h{background:#ECE8DD;font-size:12px;font-weight:700;color:var(--muted)}
+.compare .h div,.compare .r div{padding:12px 16px}
+.compare .r{border-top:1px solid var(--line)}
+.compare .r div:first-child{font-weight:700;font-size:13px}
+.compare .old{color:var(--muted);font-size:14px}
+.compare .new{background:linear-gradient(90deg,var(--accent-soft),transparent 95%);border-left:3px solid var(--accent);font-size:14px}
+@media(max-width:700px){.compare .h{display:none}.compare .r{grid-template-columns:1fr}.compare .r div:first-child{background:#F3F0E7}.compare .old::before{content:'이전안 · ';font-weight:700;font-size:11px}.compare .new::before{content:'이번 제안 · ';font-weight:700;font-size:11px;color:var(--accent)}}
+
+/* tables */
+.tw{overflow-x:auto;margin:14px 0;background:var(--paper);border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th{background:#ECE8DD;font-size:12px;text-align:left;color:var(--muted);padding:10px 14px;font-weight:700;white-space:nowrap}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:hover td{background:#FBFAF6}
+td.r,th.r{text-align:right}
+td b{font-weight:700}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:1px 9px;border-radius:99px;white-space:nowrap}
+.c1{background:var(--r1);color:var(--accent)}.c2{background:var(--r2);color:#07403C}.c3{background:var(--r3);color:#fff}
+th .chip{margin-left:0}
+.pct{display:inline-block;min-width:54px;text-align:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;padding:3px 8px}
+.p1{background:var(--r1)}.p2{background:var(--r2)}.p3{background:var(--r3);color:#fff}
+.tag{font-size:11px;background:#ECE8DD;padding:1px 8px;white-space:nowrap}
+.tag.who{background:var(--accent-soft);color:var(--accent);font-weight:700}
+
+/* process */
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:18px 0;counter-reset:s}
+.flow .s{background:var(--paper);border:1px solid var(--line);margin-left:-1px;padding:16px 16px 18px;position:relative}
+.flow .s::before{counter-increment:s;content:counter(s);display:block;font-family:'IBM Plex Mono',monospace;font-size:30px;color:var(--accent);font-weight:600;line-height:1;margin-bottom:8px}
+.flow .s b{display:block;font-size:14px;margin-bottom:4px}
+.flow .s span{font-size:13px;color:var(--muted);line-height:1.6;display:block}
+@media(max-width:860px){.flow{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.flow{grid-template-columns:1fr}}
+
+.tl{position:relative;margin:18px 0;padding-left:26px}
+.tl::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl .e{position:relative;padding:0 0 18px}
+.tl .e::before{content:'';position:absolute;left:-26px;top:7px;width:16px;height:16px;border:3px solid var(--accent);background:var(--bg);border-radius:50%}
+.tl .e.last::before{background:var(--accent)}
+.tl .e .w{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);font-weight:600}
+.tl .e b{display:block;font-size:15px}
+.tl .e span{font-size:13px;color:var(--muted);display:block;line-height:1.6}
+
+.phase{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.phase .p{background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--accent);padding:16px}
+.phase .p:nth-child(1){border-top-color:#B9C4C1}
+.phase .p .w{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);font-weight:600}
+.phase .p b{display:block;font-size:15px;margin:2px 0 6px}
+.phase .p span{font-size:13px;color:var(--muted);line-height:1.6;display:block}
+@media(max-width:860px){.phase{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.phase{grid-template-columns:1fr}}
+
+/* callouts */
+.note{border-left:4px solid var(--accent);background:var(--accent-soft);padding:14px 18px;margin:16px 0;font-size:14px}
+.note.amber{border-color:var(--amber);background:var(--amber-soft)}
+.cause{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0}
+.cause div{background:var(--paper);border:1px solid var(--line);padding:18px;font-size:14px}
+.cause div b{display:block;margin-bottom:4px}
+.cause div::before{content:attr(data-n);display:block;font-family:'IBM Plex Mono',monospace;font-size:28px;color:var(--amber);font-weight:600;line-height:1}
+@media(max-width:760px){.cause{grid-template-columns:1fr}}
+ul.clean{padding-left:20px}ul.clean li{margin:6px 0}
+
+/* budget */
+.stack{display:flex;height:34px;margin:14px 0 8px;background:#EDEAE0;overflow:hidden}
+.stack i{display:block;height:100%;flex:var(--f);transform-origin:0 50%;transform:scaleX(0)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted)}
+.legend span::before{content:'';display:inline-block;width:10px;height:10px;margin-right:6px;background:var(--c)}
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:14px}
+.formula .box{background:var(--paper);border:1px solid var(--line);padding:10px 14px;text-align:center}
+.formula .box b{display:block;font-family:'IBM Plex Mono',monospace;font-size:18px}
+.formula .box small{font-size:11px;color:var(--muted)}
+.formula .op{font-size:20px;color:var(--muted)}
+.formula .box.res{background:var(--accent);color:#fff;border-color:var(--accent)}
+.formula .box.res small{color:#CFE7E3}
+td .mini{display:block;height:6px;background:#EDEAE0;margin-top:6px;min-width:70px}
+td .mini i{display:block;height:100%;background:var(--accent);transform-origin:0 50%;transform:scaleX(var(--w,0))}
+tr.sum td{background:#F3F0E7;font-weight:700}
+tr.total td{background:var(--accent);color:#fff;font-weight:700;font-size:15px}
+
+/* target */
+.goal{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.goal{grid-template-columns:1fr}}
+.goalc{background:var(--paper);border:1px solid var(--line);padding:16px 18px}
+.goalc .q{font-size:13px;font-weight:700}
+.goalc .q small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
+.goalc .nums{display:flex;align-items:baseline;justify-content:space-between;margin-top:12px;gap:10px}
+.goalc .nums div small{display:block;font-size:11px;color:var(--muted)}
+.goalc .nums .now{font-size:20px;font-weight:600;color:var(--muted)}
+.goalc .nums .tg{font-size:28px;font-weight:600;color:var(--accent)}
+.goalc .nums .ar{color:var(--muted)}
+.goalc .tr{height:8px;background:#EDEAE0;margin-top:8px;position:relative}
+.goalc .tr i{position:absolute;inset:0 auto 0 0;background:var(--accent);transform-origin:0 50%;transform:scaleX(var(--w,0));width:100%}
+.goalc .tr i.base{background:#B9C4C1}
+.goalc .tr .gm{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--amber);left:var(--g)}
+
+/* accordion */
+details{background:var(--paper);border:1px solid var(--line);margin:-1px 0 0}
+summary{cursor:pointer;list-style:none;padding:14px 18px;font-weight:700;font-size:14px;display:flex;gap:12px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'+';font-family:'IBM Plex Mono',monospace;color:var(--accent);width:16px;font-size:18px;line-height:1;transition:transform .25s}
+details[open] summary::before{transform:rotate(45deg)}
+details .a{padding:2px 18px 16px 46px;font-size:14px;color:#37403E}
+details .a::before{content:'대응';display:inline-block;font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:0 8px;margin-right:8px}
+.ctl{display:flex;gap:8px;margin:12px 0}
+.ctl button{font:inherit;font-size:12px;border:1px solid var(--line);background:var(--paper);padding:6px 12px;cursor:pointer}
+.ctl button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* refs */
+.refs h3{margin-top:24px}
+.refs ul{padding-left:18px;font-size:14px}.refs li{margin:5px 0}
+.refs .tv li{color:#37403E}
+
+footer{border-top:1px solid var(--line);margin-top:56px;padding-top:16px;font-size:12px;color:var(--muted)}
+
+.js-motion .rv{opacity:0}
+@media print{
+  body{background:#fff}nav.toc,#progress,.ctl{display:none}.shell{display:block}
+  .rv{opacity:1!important;transform:none!important}details .a{display:block}
+  .bar .tr i,.steps3 .b,.stack i,td .mini i,.goalc .tr i{transform:none!important}
+  section{break-inside:avoid-page}.tw{break-inside:avoid}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/motion@14.13.0/dist/motion.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.1/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.1/dist/ScrollTrigger.min.js"></script>
+</head>
+<body>
+<div id="progress"></div>
+<div class="shell">
+
+<nav class="toc" aria-label="목차">
+  <b>CONTENTS</b>
+  <a href="#s1">1. 제안 개요</a>
+  <a href="#s2">2. 현황과 문제</a>
+  <a href="#s3">3. 정책 내용</a>
+  <a href="#s4">4. 회차별 혜택</a>
+  <a href="#s5">5. 카메라 프로그램</a>
+  <a href="#s6">6. 추진 체계와 일정</a>
+  <a href="#s7">7. 예산</a>
+  <a href="#s8">8. 재원 조달</a>
+  <a href="#s9">9. 성과 지표</a>
+  <a href="#s10">10. 예상 문제와 대응</a>
+  <a href="#s11">11. 근거 자료</a>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow"><i></i><span>POLICY PROPOSAL</span></div>
+  <h1>연천(連天) 패스 정책 제안서</h1>
+  <div class="meta"><span>Nov 7, 2026</span><span>@이동현</span></div>
+</header>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">01</span>제안 개요</h2>
+  <p class="lead rv"><strong>연천 패스 한 장으로 축제·액티비티·맛집을 묶고, 다시 올수록 금액 외 혜택이 강해지게 해 연천 재방문을 늘린다.</strong> 승마·카트·카약을 패스로 결제하면 액티비티마다 특화된 혜택이 회차별로 강해지고, 연천역에서 액션캠(액티비티)과 필름카메라(식음료 공간)를 빌려줘 찍은 기록을 돌려주며 다음 방문으로 잇는다.</p>
+  <p class="rv"><b>타겟:</b> 핵심은 4050 가족 단위 단체(방문 동반 1위 가족·친척 57.5%)이고, 확장 대상은 2030 커플이다. 20대는 연간 방문 1위(23.9%)지만 연인 동반은 11.7%에 그쳐, 커플이 다시 오게 만드는 장치가 비어 있다.</p>
+
+  <div class="kpis g3">
+    <div class="kpi rv"><div class="v"><span data-count="57.5" data-dec="1">57.5</span><em>%</em></div><div class="t">가족·친척 동반</div><div class="d">방문 동반 1위 · 핵심 타겟 4050 가족</div></div>
+    <div class="kpi rv warn"><div class="v"><span data-count="23.9" data-dec="1">23.9</span><em>%</em></div><div class="t">20대 연간 방문</div><div class="d">연간 방문 연령 1위</div></div>
+    <div class="kpi rv warn"><div class="v"><span data-count="11.7" data-dec="1">11.7</span><em>%</em></div><div class="t">연인 동반</div><div class="d">커플 재방문 장치가 비어 있음</div></div>
+  </div>
+
+  <h3 class="lab">이전안 → 이번 제안</h3>
+  <div class="compare rv">
+    <div class="h"><div>구분</div><div>이전안</div><div>이번 제안</div></div>
+    <div class="r"><div>사계절 혜택</div><div class="old">4계절 완주 시 명예 하늘주민, 다음 해 입장료 면제, 합본 영상</div><div class="new"><b>삭제.</b> 혜택은 1·2·3회차 이상의 방문 횟수로만 오른다</div></div>
+    <div class="r"><div>카메라</div><div class="old">액션캠만, 군이 직접 구매</div><div class="new">액티비티는 액션캠, 그 밖의 분야는 일회용 카메라. <b>렌탈·현상 업체가 공급·수거</b></div></div>
+    <div class="r"><div>대여 절차</div><div class="old">현장 신청</div><div class="new"><b>온라인 사전 등록(신상정보) → 연천역 부스에서 군 관계자가 대여 → 부스 반납 후 업체 수거</b></div></div>
+    <div class="r"><div>예산</div><div class="old">가정 단가</div><div class="new">실제 업체 공시 단가와 2026년 인건비 기준으로 재산정</div></div>
+    <div class="r"><div>실물카드</div><div class="old">축제장에서 희망자 수령</div><div class="new">모바일 QR이 기본, 희망자는 연천역 부스에서 카메라와 함께 수령</div></div>
+    <div class="r"><div>액티비티 혜택</div><div class="old">할인율만 회차별로 상승</div><div class="new">액티비티별 금액 외 특화 혜택이 1·2·3회차로 강해지고, 할인은 보조</div></div>
+    <div class="r"><div>수상 액티비티</div><div class="old">래프팅</div><div class="new">임진강 주상절리 카약 (연천 구간 한탄강은 급류 래프팅 불가)</div></div>
+    <div class="r"><div>공공시설 할인</div><div class="old num">20→25→30%</div><div class="new">조례 감경 범위 20%, 3회차 이상 비수기 평일 30%</div></div>
+    <div class="r"><div>다음 축제 안내</div><div class="old">알림톡에 함께</div><div class="new">알림톡(이용 안내)과 브랜드 메시지(광고 동의자)로 분리</div></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">02</span>현황과 문제</h2>
+  <p class="rv">1호선 개통으로 연천에 오는 사람은 늘었지만, 누가 다시 오는지 모르고 다시 부를 장치도 없다.</p>
+
+  <div class="kpis g4">
+    <div class="kpi rv"><div class="v"><span data-count="173.9" data-dec="1">173.9</span><em>만 명</em></div><div class="t">1호선 개통 후 관광객</div><div class="d">2024.1~10월 · +4.6% — 오게 하는 데는 성공</div></div>
+    <div class="kpi rv"><div class="v">약 <span data-count="4">4</span><em>시간</em></div><div class="t">평균 체류</div><div class="d">당일 방문 중심 — 한 곳에서 일정이 끝남</div></div>
+    <div class="kpi rv"><div class="v"><span data-count="88.6" data-dec="1">88.6</span><em>%</em></div><div class="t">구석기축제 외지인</div><div class="d">2026 입장객 6만 6,562명 · 외지 방문객 소비가 핵심</div></div>
+    <div class="kpi rv warn"><div class="v"><span data-count="59329">59,329</span><em>원</em></div><div class="t">1인 평균 지출</div><div class="d">2026 구석기축제 기준</div></div>
+  </div>
+
+  <div class="goal">
+    <div class="card rv">
+      <h3 class="lab" style="margin-top:0">방문 동반 형태</h3>
+      <div class="bars">
+        <div class="bar"><span>가족·친척</span><div class="tr"><i style="--w:.575"></i></div><span class="val num"><span data-count="57.5" data-dec="1">57.5</span>%</span></div>
+        <div class="bar alt"><span>친구</span><div class="tr"><i style="--w:.239"></i></div><span class="val num"><span data-count="23.9" data-dec="1">23.9</span>%</span></div>
+        <div class="bar mute"><span>연인</span><div class="tr"><i style="--w:.117"></i></div><span class="val num"><span data-count="11.7" data-dec="1">11.7</span>%</span></div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:8px 0 0">경기도 관광지 실태조사 · 가족이 주력, 커플 재방문은 아직 작음</p>
+    </div>
+    <div class="card rv">
+      <h3 class="lab" style="margin-top:0">디지털 관광주민증 실사용률</h3>
+      <div class="steps3">
+        <div class="col"><span class="num">13.9%</span><div class="b" style="--h:1"></div><small>2022</small></div>
+        <div class="col"><span class="num">6.0%</span><div class="b" style="--h:.43"></div><small>→</small></div>
+        <div class="col"><span class="num">2.4%</span><div class="b" style="--h:.17"></div><small>2024.9</small></div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:8px 0 0">발급에서 멈추고, 업체가 할인 비용을 떠안아 실패</p>
+    </div>
+  </div>
+
+  <div class="note rv"><b>연천 3개월 내 재방문율 50% 이상</b> (2026년 1분기 생활인구) — 다시 오긴 하지만 누가, 어느 축제로 왔는지 모른다.</div>
+
+  <h3 class="lab">원인은 세 가지다</h3>
+  <div class="cause">
+    <div class="rv" data-n="01"><b>축제·액티비티·맛집이 따로 논다.</b>예약처·결제·혜택이 제각각이라 하나를 하면 거기서 끝난다.</div>
+    <div class="rv" data-n="02"><b>다시 올 이유가 없다.</b>혜택이 그날 하루로 끝나고 방문 횟수와 무관하다.</div>
+    <div class="rv" data-n="03"><b>방문을 기록하고 다시 연락할 수단이 없다.</b>생활인구 통계는 지역 단위 집계라 개인에게 다음 축제를 알릴 수 없다.</div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">03</span>정책 내용: 연천 패스</h2>
+  <p class="rv">연천 패스는 무료로 발급하는 1인 1패스(모바일 QR 기본, 희망자는 실물카드)로, 연천 안의 축제·공공 관광시설·액티비티·맛집에서 같이 쓴다.</p>
+  <div class="tw rv"><table>
+    <thead><tr><th>연결 대상</th><th>예시</th><th>운영 주체</th></tr></thead>
+    <tbody>
+      <tr><td><b>축제</b></td><td>구석기축제, DMZ 국제음악제, 국화·율무축제</td><td>연천군·축제추진위원회</td></tr>
+      <tr><td><b>공공 관광시설</b></td><td>한탄강관광지, 재인폭포오토캠핑장, 세계캠핑체험존</td><td>연천군시설관리공단</td></tr>
+      <tr><td><b>액티비티</b></td><td>승마(연천승마공원), 카트(재인폭포 오토캠핑장), 카야(임진강 주상절리)</td><td>민간 업체·공단</td></tr>
+      <tr><td><b>맛집</b></td><td>지정 상권, 착한가격업소</td><td>민간 (할인은 군 부담)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="lab">발급과 이용</h3>
+  <div class="flow rv">
+    <div class="s"><b>온라인 등록</b><span>웹·카카오 링크에서 이름, 휴대폰 번호, 생년월일, 거주 시군을 적고 개인정보 수집·이용에 동의한다. 이때 카메라 대여도 함께 신청한다.</span></div>
+    <div class="s"><b>연천역 부스 수령</b><span>패스 QR과 신분증을 확인하고 카메라를 받는다. 실물카드를 신청한 사람은 이때 함께 받는다.</span></div>
+    <div class="s"><b>이용</b><span>축제 입장, 시설 체크인, 액티비티·맛집 결제 때 패스 QR을 찍는다. 결제는 연천사랑상품권으로 한다.</span></div>
+    <div class="s"><b>반납·안내</b><span>카메라를 연천역 부스에 반납하면 사진·영상 링크는 알림톡으로 가고, 다음 축제 안내는 광고 수신 동의자에게 카카오 브랜드 메시지로 따로 간다.</span></div>
+  </div>
+  <div class="note rv"><b>회차 세는 법:</b> 날짜 기준으로 연천 전체에서 센다. 같은 날 여러 곳을 가도 <b>1회차</b>이고, 다른 날 다시 와야 회차가 오른다.</div>
+  <p class="rv"><b>실물카드:</b> 온라인 등록 때 희망한 사람만 연천역 부스에서 받는다. 지갑에 남아 다음 방문을 떠올리게 하고, 스마트폰이 익숙하지 않은 고령층도 쓸 수 있다. 카드 뒷면 QR은 모바일 패스와 같은 번호라 어느 쪽으로 찍어도 같은 회차가 쌓인다. 결제 기능은 없고 결제는 연천사랑상품권(실물카드·삼성페이·카카오페이)으로 한다. 분실하면 온라인으로 재발급을 신청하고, 그동안은 모바일 QR로 쓴다.</p>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">04</span>회차별 혜택</h2>
+  <p class="rv">혜택은 1회차·2회차·3회차 이상 세 단계로 오르고, 사계절 완주 보상은 두지 않는다. 중심은 액티비티마다 다른 금액 외 혜택이고, 할인은 보조다. 할인분은 업체가 아니라 군이 부담한다.</p>
+
+  <h3 class="lab">액티비티별 특화 혜택 (금액 외)</h3>
+  <div class="tw rv"><table>
+    <thead><tr><th>액티비티</th><th><span class="chip c1">1회차</span></th><th><span class="chip c2">2회차</span></th><th><span class="chip c3">3회차 이상</span></th><th>주 타겟</th></tr></thead>
+    <tbody>
+      <tr><td><b>승마</b><br><small>연천승마공원</small></td><td>탄 말 이름 카드</td><td>같은 말 지정 예약</td><td>초지 주로 외승</td><td><span class="tag">가족·커플</span></td></tr>
+      <tr><td><b>카트</b><br><small>재인폭포 오토캠핑장</small></td><td>랩타임 기록 (측정 장비 있을 때)</td><td>랩타임 순위판 게시</td><td>전용 시간대 주행</td><td><span class="tag">2인승은 커플</span></td></tr>
+      <tr><td><b>카약</b><br><small>임진강 주상절리</small></td><td>2인 1조 기본 코스</td><td>우선 예약</td><td>가이드 동행 코스</td><td><span class="tag">커플</span></td></tr>
+      <tr><td><b>구석기 체험</b></td><td>만든 석기를 "전곡리안 수첩"에 기록</td><td>바비큐·체험 우선 예약</td><td>주먹도끼 심화 과정</td><td><span class="tag">가족</span></td></tr>
+      <tr><td><b>카메라</b><br><small>전 분야</small></td><td>대여 + 원본·스캔 파일</td><td>다음 대여 우선 예약</td><td>인화 엽서 3장 또는 필름카메라 1대 추가</td><td><span class="tag">전체</span></td></tr>
+    </tbody>
+  </table></div>
+  <ul class="clean rv">
+    <li><b>4050 가족:</b> 아이 동반 체험 우선 예약, 가족당 카메라 1대.</li>
+    <li><b>2030 커플:</b> 2인승 카트·2인 카약, 둘이 함께 남기는 영상·사진.</li>
+    <li><b>3회차 보상은 거주지 구분 없이 해당 회차 참가자 전원에게 준다.</b> 연천군 관광진흥 조례 제6조의2는 군이 시행하는 관광 프로그램 참가자에게 기념품을 줄 수 있게 하지만, 군민에게만 주면 선거법 기부행위 소지가 있다.</li>
+  </ul>
+
+  <h3 class="lab">할인율 (회차가 오를수록 커진다)</h3>
+  <div class="tw rv"><table>
+    <thead><tr><th>구분</th><th>1회차</th><th>2회차</th><th>3회차 이상</th><th>방식 · 부담</th><th>적용 시기</th></tr></thead>
+    <tbody>
+      <tr><td><b>축제 매점·먹거리</b></td><td><span class="pct p1">5%</span></td><td><span class="pct p2">7%</span></td><td><span class="pct p3">10%</span></td><td>현장 할인, 군이 축제 예산으로 보전</td><td>1단계부터</td></tr>
+      <tr><td><b>공공 관광시설</b></td><td><span class="pct p1">20%</span></td><td><span class="pct p2">20%</span></td><td><span class="pct p3">20%</span><br><small>비수기 평일 <b>30%</b></small></td><td>공단 사용료 감경. 한탄강관광지 조례 제5조(20% 감경)·제4조(비수기 평일 30% 범위 인하) 안에서 운영</td><td>1단계부터</td></tr>
+      <tr><td><b>민간 액티비티</b></td><td><span class="pct p1">5%</span></td><td><span class="pct p2">10%</span></td><td><span class="pct p3">15%</span></td><td>상품권 후캐시백, 회당 1인 1만 원 상한</td><td>결제 연동 확인 후 2단계</td></tr>
+      <tr><td><b>맛집</b></td><td><span class="pct p1">3%</span></td><td><span class="pct p2">5%</span></td><td><span class="pct p3">7%</span></td><td>상품권 후캐시백, 회당 1인 5천 원 상한</td><td>결제 연동 확인 후 2단계</td></tr>
+    </tbody>
+  </table></div>
+  <p class="rv" style="font-size:13px;color:var(--muted)">모든 혜택에는 "혜택 내용과 할인율은 예산·운영 여건에 따라 변경될 수 있음"을 고지한다.</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">05</span>카메라 프로그램</h2>
+  <p class="rv">액티비티 이용자에게는 액션캠을, 축제 먹거리·맛집 등 식음료 공간 방문객에게는 필름카메라(일회용)를 빌려준다. 군이 직접 사면 초기 투자와 충전·수리·보관 부담이 커서 렌트·현상 업체와 협업한다. 장비는 업체가 공급·수거하고, 연천역 부스에서는 연천군 관계자가 신원을 확인하고 내준다. 일회용 카메라 사진은 현상 후 1~2주 뒤 알림톡으로 도착하므로, 연천을 한 번 더 떠올리게 하고, 광고 수신 동의자에게는 이때 다음 축제를 브랜드 메시지로 함께 안내한다.</p>
+
+  <div class="tw rv"><table>
+    <thead><tr><th>구분</th><th>액션캠</th><th>일회용 카메라</th></tr></thead>
+    <tbody>
+      <tr><td><b>대상</b></td><td>승마·카트·카약 예약자</td><td>축제 먹거리·맛집 등 식음료 공간 방문객, 가족·일행당 1대</td></tr>
+      <tr><td><b>공급·수거</b></td><td>액션캠 렌탈 업체가 운영일 전날 부스로 배송, 다음 날 수거</td><td>필름 현상 업체가 카메라 공급, 주 1회 부스 반납함 수거</td></tr>
+      <tr><td><b>하루 수량</b></td><td class="num"><b>20세트</b></td><td class="num"><b>축제일 100대</b>, 주말 50대 (선착순 사전 신청)</td></tr>
+      <tr><td><b>반납</b></td><td>당일 <b class="num">18:00</b>까지 연천역 부스</td><td>당일 <b class="num">18:00</b>까지 연천역 부스 반납함 (다 못 찍어도 반납)</td></tr>
+      <tr><td><b>결과물</b></td><td>반납 즉시 부스에서 메모리 업로드, 원본 링크를 알림톡으로</td><td>업체가 현상·스캔 후 <b class="num">7~10일</b> 안에 파일 링크를 알림톡으로</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="lab">대여 절차 · 7단계</h3>
+  <div class="tw rv"><table>
+    <thead><tr><th>단계</th><th>누가</th><th>무엇을</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>1</b> 온라인 등록</td><td><span class="tag who">방문객</span></td><td>이름·휴대폰 번호·생년월일·거주 시군 입력, 동의 3항목(필수 수집 / 대여 관리 / 혜택 안내) 체크, 대여 날짜·카메라 종류·실물카드 희망 여부 선택. 14세 미만은 보호자가 신청</td></tr>
+      <tr><td class="num"><b>2</b> 공급</td><td><span class="tag who">렌탈·현상 업체</span></td><td>운영일 전날 부스로 장비 입고, 수량·작동 확인</td></tr>
+      <tr><td class="num"><b>3</b> 대여</td><td><span class="tag who">연천군 관계자</span></td><td>부스에서 패스 QR과 신분증을 대조하고 장비와 실물카드(희망자) 지급, 사용·반납 안내</td></tr>
+      <tr><td class="num"><b>4</b> 사용</td><td><span class="tag who">방문객</span></td><td>축제·액티비티·맛집에서 촬영. 액션캠 장착은 업체 안전요원이 판단</td></tr>
+      <tr><td class="num"><b>5</b> 반납</td><td><span class="tag who">방문객 → 연천군 관계자</span></td><td>당일 <span class="num">18:00</span>까지 부스 반납, 관계자가 반납 확인 처리</td></tr>
+      <tr><td class="num"><b>6</b> 수거</td><td><span class="tag who">렌탈·현상 업체</span></td><td>액션캠은 다음 날, 일회용은 주 1회 부스에서 수거</td></tr>
+      <tr><td class="num"><b>7</b> 전달</td><td><span class="tag who">연천군 (알림톡)</span></td><td>사진·영상 링크는 알림톡, 다음 축제 안내는 광고 동의자에게 브랜드 메시지로 발송</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="rv"><b>회차별 카메라 혜택:</b> <span class="chip c1">1회차</span> 대여와 원본·스캔 파일, <span class="chip c2">2회차</span> 다음 대여 우선 예약(하루 수량이 한정이라 실질 혜택), <span class="chip c3">3회차 이상</span> 일회용 사진 인화 엽서 3장 우편 발송 또는 액션캠 이용자에게 필름카메라 1대 추가. 거주지 구분 없이 해당 회차 참가자 전원에게 준다.</p>
+  <div class="note rv"><b>개인정보:</b> 신상정보는 대여 관리와 분실 대응에만 쓰고, 주소는 받지 않는다(엽서는 3회차 신청자만 별도 동의 후 주소 수집). 대여 기록은 <span class="num"><b>반납 확인 후 3개월</b></span>, 패스 방문 기록은 <span class="num"><b>최대 13개월</b></span> 보관 후 파기한다.</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">06</span>추진 체계와 일정</h2>
+  <p class="rv">새 조직 없이 연천군 관광과가 총괄하고, 장비는 업체에 맡겨 군은 신원 확인과 대여만 한다.</p>
+  <div class="tw rv"><table>
+    <thead><tr><th>주체</th><th>역할</th></tr></thead>
+    <tbody>
+      <tr><td><b>연천군 관광과</b></td><td>총괄, 업체 계약, 연천역 부스 운영(기간제 인력 2명 + 담당 공무원 감독), 축제 매점 할인 보전</td></tr>
+      <tr><td><b>액션캠 렌탈 업체</b></td><td>장비 공급·배송·수거·정비, 파손·분실 처리</td></tr>
+      <tr><td><b>필름 현상 업체</b></td><td>일회용 카메라 공급, 주 1회 수거, 현상·스캔 파일 전달</td></tr>
+      <tr><td><b>연천군시설관리공단</b></td><td>캠핑장·관광지 감면, 카트장 계절별 운영일 협의, 예약 시스템 우선 예약 적용</td></tr>
+      <tr><td><b>축제추진위원회</b></td><td>입장 동선에 패스 스캔 지점 추가</td></tr>
+      <tr><td><b>민간 액티비티 업체</b></td><td>회차별 혜택 제공, 액션캠 현장 장착 협조</td></tr>
+      <tr><td><b>경제교통과 지역경제팀·경기도</b></td><td>2단계 상품권 후캐시백 연동</td></tr>
+      <tr><td><b>연천군 건설과·코레일</b></td><td>연천역 앞 교통광장 도로점용 허가(공익 행사 점용료 감면 가능), 역사 전면 철도 부지라 코레일 협의</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="lab">단계별 일정</h3>
+  <div class="phase">
+    <div class="p rv"><span class="w">0 · 2026.12~2027.4</span><b>준비</b><span>업체 견적 3곳 비교·계약, 등록 웹 구축, 연천역 교통광장 도로점용 협의, 개인정보 동의서·대여 약관 작성</span></div>
+    <div class="p rv"><span class="w">1 · 2027.5~6</span><b>시범</b><span>구석기축제 4일 + 주말 4회(8일), 총 <b class="num">12일</b> 운영. 무작위 비교 집단으로 재방문 기준선 측정</span></div>
+    <div class="p rv"><span class="w">2 · 2027.7~10</span><b>확대</b><span>DMZ 국제음악제·국화·율무축제와 주말 운영, 결제 연동 확인 시 캐시백 시작, 지역사랑 휴가지원 2027년 공모 신청</span></div>
+    <div class="p rv"><span class="w">3 · 2027.11~12</span><b>판단</b><span>순증 2회차 전환율이 회수선 이상이면 2028년 본사업 예산 반영, 미달 시 1회 조정 후 재시범, 그래도 미달이면 중단</span></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">07</span>예산 (1단계 시범)</h2>
+  <p class="lead rv"><strong>시범 12일 운영 예산은 약 1억 354만 원이다.</strong> 이 중 카메라 프로그램이 약 2,870만 원이고, 가장 큰 단일 항목은 필름카메라 구입·현상(약 2,400만 원)이다. 단가는 2026년 시중 공시가와 팀의 14개 항목 검증 보고서(2026.11.13) 기준이며, 계약 전 업체 3곳 견적으로 확정한다.</p>
+
+  <div class="kpis g3">
+    <div class="kpi dark rv"><div class="v"><span data-count="10354">10,354</span><em>만 원</em></div><div class="t">합계 (예비비 포함)</div><div class="d">소계 9,861 + 예비비 5% 493</div></div>
+    <div class="kpi rv"><div class="v"><span data-count="2870">2,870</span><em>만 원</em></div><div class="t">카메라 프로그램</div><div class="d">전체의 약 28%</div></div>
+    <div class="kpi rv warn"><div class="v"><span data-count="2400">2,400</span><em>만 원</em></div><div class="t">필름카메라 구입·현상</div><div class="d">가장 큰 단일 항목 (구입 1,760 + 현상·스캔 640)</div></div>
+  </div>
+
+  <h3 class="lab">구분별 비중 (소계 9,861만 원 기준)</h3>
+  <div class="stack rv" id="stack">
+    <i style="--f:3000;background:#0B5D57" title="시스템 3,000"></i>
+    <i style="--f:2870;background:#2E8F85" title="카메라 2,870"></i>
+    <i style="--f:1000;background:#B7791F" title="혜택 1,000"></i>
+    <i style="--f:1000;background:#D4A64F" title="평가 1,000"></i>
+    <i style="--f:500;background:#6C7A77" title="발급 500"></i>
+    <i style="--f:500;background:#9AA7A4" title="홍보 500"></i>
+    <i style="--f:480;background:#B4412F" title="이동 480"></i>
+    <i style="--f:423;background:#CF7B6C" title="부스 423"></i>
+    <i style="--f:88;background:#3B4A47" title="안내 88"></i>
+  </div>
+  <div class="legend rv">
+    <span style="--c:#0B5D57">시스템 3,000</span><span style="--c:#2E8F85">카메라 2,870</span><span style="--c:#B7791F">혜택 1,000</span><span style="--c:#D4A64F">평가 1,000</span><span style="--c:#6C7A77">발급 500</span><span style="--c:#9AA7A4">홍보 500</span><span style="--c:#B4412F">이동 480</span><span style="--c:#CF7B6C">부스 423</span><span style="--c:#3B4A47">안내 88</span>
+  </div>
+
+  <h3 class="lab">항목별 산식 (단위: 만 원)</h3>
+  <div class="tw rv"><table style="min-width:760px">
+    <thead><tr><th>구분</th><th>항목</th><th>산식</th><th class="r">금액 (만 원)</th><th>단가 근거</th></tr></thead>
+    <tbody id="bt">
+      <tr><td>카메라</td><td>액션캠 렌탈</td><td class="num">20세트 × 17일 × 12,000원</td><td class="r num"><b>408</b><span class="mini"><i style="--w:.136"></i></span></td><td>고프로12 풀세트 1일 12,000원, 기사 방문 수거 (<a href="https://www.waug.com/activities/143347">와그</a>). 택배 반납형은 2박 3일 8,400원부터지만 업체 수거 조건이 아니라 적용하지 않음</td></tr>
+      <tr><td>카메라</td><td>액션캠 파손·분실 예비비</td><td class="num">렌탈료의 약 12%</td><td class="r num"><b>50</b><span class="mini"><i style="--w:.017"></i></span></td><td>자체 가정</td></tr>
+      <tr><td>카메라</td><td>필름카메라(일회용)</td><td class="num">800대 × 22,000원</td><td class="r num"><b>1,760</b><span class="mini"><i style="--w:.587"></i></span></td><td>후지 퀵스냅 27컷 공식몰 22,000원(100대 묶음 무료배송), 코닥 펀세이버 공식몰 23,000원 (팀 검증 보고서)</td></tr>
+      <tr><td>카메라</td><td>현상·스캔</td><td class="num">800롤 × 8,000원</td><td class="r num"><b>640</b><span class="mini"><i style="--w:.213"></i></span></td><td>현상소 롤당 5,000~8,500원(망우삼림·고래사진관·필름로그) 중 상단 (팀 검증 보고서)</td></tr>
+      <tr><td>카메라</td><td>일회용 수거 운송</td><td class="num">6회 × 20,000원</td><td class="r num"><b>12</b><span class="mini"><i style="--w:.004"></i></span></td><td>자체 가정</td></tr>
+      <tr><td>부스</td><td>운영 인력 (기간제)</td><td class="num">2명 × 14일 × 104,000원</td><td class="r num"><b>291</b><span class="mini"><i style="--w:.097"></i></span></td><td>연천군 2026 생활임금 시급 11,300원 × 8시간 + 주휴·4대보험 약 15% (팀 검증 보고서)</td></tr>
+      <tr><td>부스</td><td>텐트 3×3m</td><td class="num">2동 × 12일 × 30,000원</td><td class="r num"><b>72</b><span class="mini"><i style="--w:.024"></i></span></td><td>3×3m 부스 설치 1일 3만 원 (<a href="https://kuhj.korea.ac.kr/_res/kuhj/etc/%EB%8C%80%EA%B4%80%EB%A3%8C%EC%9A%94%EC%9C%A8%ED%91%9C.pdf">고려대 화정체육관 대관 요율표</a>)</td></tr>
+      <tr><td>부스</td><td>집기·현수막·잠금 반납함</td><td class="num">일괄</td><td class="r num"><b>60</b><span class="mini"><i style="--w:.02"></i></span></td><td>자체 가정</td></tr>
+      <tr><td>이동</td><td>연천역 ↔ 액티비티 셔틀</td><td class="num">25인승 1대 × 12일 × 400,000원</td><td class="r num"><b>480</b><span class="mini"><i style="--w:.16"></i></span></td><td>25인승 당일 30~40만 원 (<a href="https://miso.kr/blog/%EA%B0%95%EB%82%A8-%EA%B4%80%EA%B4%91-%EB%B2%84%EC%8A%A4-%EB%8C%80%EC%A0%88-%EC%98%88%EC%95%BD-%EB%B9%84%EC%9A%A9">미소</a>), 유가 상승 반영 상단</td></tr>
+      <tr><td>안내</td><td>알림톡</td><td class="num">2만 명 × 4건 × 10원 × VAT</td><td class="r num"><b>88</b><span class="mini"><i style="--w:.029"></i></span></td><td>월 1만~10만 건 구간 건당 10원 (<a href="https://solapi.com/guides/tiered-pricing">솔라피</a>)</td></tr>
+      <tr><td>시스템</td><td>패스 등록·대여 신청 웹</td><td class="num">신규 1건</td><td class="r num"><b>3,000</b><span class="mini"><i style="--w:1"></i></span></td><td>상한값. 기존 모바일 스탬프 플랫폼 활용 시 견적 비교 후 인하</td></tr>
+      <tr><td>발급</td><td>실물카드 (희망자)</td><td class="num">1만 장 × 500원</td><td class="r num"><b>500</b><span class="mini"><i style="--w:.167"></i></span></td><td>발급 2만 명 중 50% 희망 가정. PVC 카드 대량 단가 장당 약 120~690원(홍콩 3천 장 HKD 0.69, 미국 5천 장 $0.49)에 개별 QR 인쇄를 감안해 상단 적용</td></tr>
+      <tr><td>혜택</td><td>축제 매점 할인 보전</td><td class="num">2만 명 × 1만 원 × 5%</td><td class="r num"><b>1,000</b><span class="mini"><i style="--w:.333"></i></span></td><td>1인 매점 지출 1만 원은 가정, 용역 보고서로 확인</td></tr>
+      <tr><td>홍보</td><td>홍보물</td><td class="num">일괄</td><td class="r num"><b>500</b><span class="mini"><i style="--w:.167"></i></span></td><td>자체 가정</td></tr>
+      <tr><td>평가</td><td>성과 분석</td><td class="num">무작위 비교 설계·분석</td><td class="r num"><b>1,000</b><span class="mini"><i style="--w:.333"></i></span></td><td>자체 가정</td></tr>
+      <tr class="sum"><td></td><td>소계</td><td></td><td class="r num">9,861</td><td></td></tr>
+      <tr class="sum"><td></td><td>예비비</td><td class="num">소계의 5%</td><td class="r num">493</td><td></td></tr>
+      <tr class="total"><td></td><td>합계</td><td></td><td class="r num">10,354</td><td></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="lab">회수선 — 시범 비용을 뽑으려면 몇 명이 추가로 와야 하나</h3>
+  <div class="formula rv">
+    <div class="box"><b>1억 354만 원</b><small>시범 합계</small></div><span class="op">÷</span>
+    <div class="box"><b>59,329원</b><small>1인 평균 지출</small></div><span class="op">÷</span>
+    <div class="box"><b>2만 명</b><small>발급</small></div><span class="op">=</span>
+    <div class="box res"><b>약 8.7%</b><small>회수선</small></div>
+  </div>
+  <p class="rv" style="font-size:14px">패스 덕분에 추가로 다시 온 사람이 발급자의 <b>8.7%</b>를 넘으면 시범 비용 이상의 지역 소비가 생긴다.</p>
+
+  <ul class="clean rv">
+    <li><b>17일인 이유:</b> 운영 12일에 장비 입고일(축제 전날 1일, 주말 4회의 금요일 4일)을 더했다.</li>
+    <li><b>예산에 넣지 않은 것:</b> 공공시설 감면은 지출이 아니라 사용료 수입 감소라 별도로 관리한다. 맛집·민간 액티비티 캐시백은 2단계에 연간 상한을 정해 따로 편성한다.</li>
+    <li><b>확대 시 단가:</b> 주말 하루 운영 변동비는 액션캠 약 36만 원, 필름카메라 50대 약 150만 원(구입 22,000원 + 현상 8,000원), 인력 21만 원, 텐트 6만 원, 셔틀 40만 원으로 약 250만 원이다.</li>
+    <li><b>줄일 여지:</b> 현상은 롤당 5,000원 업체를 쓰면 240만 원이 더 줄고, 등록 웹을 기존 플랫폼으로 대신하면 3,000만 원 항목이 크게 준다. 텐트 화물비(경기권 왕복 8만~18만 원)는 집기 항목에서 흡수한다.</li>
+  </ul>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2><span class="n">08</span>재원 조달</h2>
+  <p class="rv">2027년 본예산은 이미 편성 단계라, 시범은 신규 편성 대신 기존 축제 예산 조정과 국비로 시작한다.</p>
+  <div class="tw rv"><table>
+    <thead><tr><th>단계</th><th>주 재원</th><th>보조 재원</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr><td><b>1. 시범</b><br><small class="num">2027.5~6</small></td><td>기존 축제 예산 조정</td><td>문화관광축제 국비</td><td>구석기축제는 문체부 지정 2026~2027 문화관광축제이고, 올해 축제 평가에서 "디지털 인프라 개선"이 과제로 꼽힘 (<a href="https://kyeonggi.com/article/20260708580181">경기일보</a>)</td></tr>
+      <tr><td><b>2. 확대</b><br><small class="num">2027.7~10</small></td><td>1회 추경</td><td>지역사랑 휴가지원 공모</td><td>농어촌 인구감소지역 대상 국비 사업, 2027년부터 대상 확대 예정. 연천은 84개 대상 지역에 포함되나 2026년 시범 25곳에는 미선정 (<a href="https://mobile.newsis.com/view/NISX20260227_0003528809">뉴시스</a>)</td></tr>
+      <tr><td><b>3. 본사업</b><br><small class="num">2028~</small></td><td>지방소멸대응기금</td><td>고향사랑기부</td><td>2026년부터 시설 투자 대신 생활인구 확대 사업 중심으로 개편 (<a href="https://www.fnnews.com/news/202512030937251152">파이낸셜뉴스</a>)</td></tr>
+    </tbody>
+  </table></div>
+  <p class="rv">연천은 2026~2027년 농어촌 기본소득 시범지역이라 군비 부담이 크다(<a href="https://www.dailian.co.kr/news/view/1561701/">데일리안</a>). 그래서 군비 신규 투입은 최소화하고 국비·기금을 앞세운다.</p>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2><span class="n">09</span>성과 지표</h2>
+  <p class="lead rv">핵심은 패스 덕분에 <strong>"추가로" 다시 온 사람의 비율</strong>이다. 발급자를 무작위로 나눠 혜택·알림을 받은 집단과 받지 않은 집단의 재방문율 차이로 재고, 비교 집단에는 다음 축제에서 같은 혜택을 소급 제공한다.</p>
+
+  <div class="goal">
+    <div class="goalc rv" style="grid-column:1/-1;border-top:3px solid var(--accent)">
+      <div class="q">순증 2회차 전환율 <span class="tag who">핵심</span><small>기준: 회수선 약 8.7%</small></div>
+      <div class="nums"><div><small>기준 (회수선)</small><span class="now num" data-count="8.7" data-dec="1">8.7</span><span class="now">%</span></div><span class="ar">→</span><div style="text-align:right"><small>시범 목표</small><span class="tg num"><span data-count="20">20</span>%</span></div></div>
+      <div class="tr"><i class="base" style="--w:.435;width:100%"></i><i style="--w:1;width:100%;opacity:.25"></i></div>
+    </div>
+
+    <div class="goalc rv"><div class="q">카메라 반납률<small>첫 측정</small></div><div class="nums"><div><small>기준</small><span class="now">첫 측정</span></div><span class="ar">→</span><div style="text-align:right"><small>시범 목표</small><span class="tg num">95%<small style="display:inline;font-size:13px"> 이상</small></span></div></div><div class="tr"><i style="--w:.95"></i></div></div>
+    <div class="goalc rv"><div class="q">사진 전달 후 다음 축제 사전 신청 전환율<small>광고 수신 동의자</small></div><div class="nums"><div><small>기준</small><span class="now">첫 측정</span></div><span class="ar">→</span><div style="text-align:right"><small>시범 목표</small><span class="tg num">10%</span></div></div><div class="tr"><i style="--w:.1"></i></div></div>
+    <div class="goalc rv"><div class="q">패스 보유자 평균 체류 시간<small>기준: 연천군 자료</small></div><div class="nums"><div><small>기준</small><span class="now num">4시간</span></div><span class="ar">→</span><div style="text-align:right"><small>시범 목표</small><span class="tg num">5시간</span></div></div><div class="tr"><i class="base" style="--w:.8;width:100%"></i><i style="--w:1;opacity:.25"></i></div></div>
+    <div class="goalc rv"><div class="q">축제장 밖 사용 비율<small>액티비티·맛집·공공시설</small></div><div class="nums"><div><small>기준</small><span class="now">첫 측정</span></div><span class="ar">→</span><div style="text-align:right"><small>시범 목표</small><span class="tg num">20%</span></div></div><div class="tr"><i style="--w:.2"></i></div></div>
+    <div class="goalc rv" style="grid-column:1/-1"><div class="q">타겟별 재방문율 (4050 가족 / 2030 커플)<small>기준: 연인 동반 11.7% (경기도 관광지 실태조사)</small></div><div class="nums"><div><small>기준</small><span class="now num">11.7%</span></div><span class="ar">→</span><div style="text-align:right"><small>시범 목표</small><span class="tg" style="font-size:18px">타겟별 비교 보고</span></div></div></div>
+  </div>
+  <p class="rv" style="font-size:14px">체류 시간은 첫 스캔과 마지막 스캔(카메라 반납 포함) 시각의 차이로 추정한다. 연천역 반납 시각이 하루의 끝을 자연스럽게 기록해 주는 셈이다.</p>
+</section>
+
+<!-- 10 -->
+<section id="s10">
+  <h2><span class="n">10</span>예상 문제와 대응</h2>
+  <div class="ctl"><button type="button" id="openAll">모두 펼치기</button><button type="button" id="closeAll">모두 접기</button></div>
+  <div class="rv">
+    <details><summary>신상정보를 받는 데 대한 거부감·유출 우려</summary><div class="a">이름·휴대폰·생년월일·거주 시군만 받고 주소는 받지 않음. 동의 3항목 분리, 대여 기록 반납 후 3개월 보관, 위탁 업체는 군이 관리·감독</div></details>
+    <details><summary>카메라 분실·미반납</summary><div class="a">신분증 대조 후 지급, 미반납 시 다음 회차 혜택 정지, 고의·중과실만 실비 청구. 액션캠 파손·분실 예비비 50만 원</div></details>
+    <details><summary>일회용 카메라 수요 초과</summary><div class="a">선착순 사전 신청, 가족·일행당 1대, 하루 수량 공개</div></details>
+    <details><summary>업체가 액션캠 20세트를 동시에 못 맞춤</summary><div class="a">계약 시 수량 보증 조건, 2개 업체 분할 계약</div></details>
+    <details><summary>반납이 늦어 귀가 열차를 놓침</summary><div class="a">연천행 전철은 1시간에 1대라(<a href="https://mediahub.seoul.go.kr/archives/2009777">서울시 미디어허브</a>) 반납 마감 <span class="num">18:00</span>과 귀가 열차 시간을 함께 안내</div></details>
+    <details><summary>카약 우천·수위 취소</summary><div class="a">한탄강은 집중호우 때 수위가 급격히 오름(<a href="https://www.newspim.com/news/view/20260903000763">뉴스핌</a>). 취소 시 대여도 자동 취소</div></details>
+    <details><summary>연천역 부스 공간</summary><div class="a">역 앞 광장은 연천고려인삼축제가 열리는 공간(<a href="https://www.kyeonggi.com/article/20240919580118">경기일보</a>). 교통광장은 연천군 관리라 군 건설과 도로점용 허가로 해결하고, 역사 전면 철도 부지라 코레일과 협의</div></details>
+    <details><summary>카트 동절기 운영·연천 래프팅 부재</summary><div class="a">카트장은 공단 직영으로 운영 중이고 동절기 가동은 관리사무소에 확인. 연천 구간 한탄강은 급류 래프팅이 안 돼 임진강 주상절리 카약으로 운영</div></details>
+    <details><summary>일회용 카메라 폐기물</summary><div class="a">현상 업체가 수거하므로 본체 재활용 경로를 계약 조건에 넣음</div></details>
+    <details><summary>군민 역차별 논란</summary><div class="a">군민도 같은 패스로 발급. 공공시설은 조례상 군민 20% 감경이 그대로 적용되고, 회차 보상은 거주지 구분 없이 참가자 전원에게 줘 선거법 기부행위 소지를 피함</div></details>
+    <details><summary>실물카드 분실·미사용</summary><div class="a">모바일 QR과 같은 번호라 분실해도 회차 기록은 유지, 온라인 재발급. 희망자에게만 만들어 버려지는 카드를 줄임</div></details>
+    <details><summary>알림톡에 다음 축제 안내 불가</summary><div class="a">2026년 11월 1일 카카오 심사 기준상 신청 범위 밖 행사 안내는 반려. 사진·이용 안내는 알림톡(채널 추가형), 다음 축제 안내는 광고 수신 동의자에게 브랜드 메시지로 분리</div></details>
+    <details><summary>사적(전곡리 유적) 안 부스 허가</summary><div class="a">연천군 주최·연중 100일 이내·비관입 고정·동별 <span class="num">50㎡</span> 미만이면 연천군수 자체 허가(국가유산청 고시 제2024-103호). 3×3m 부스는 해당</div></details>
+  </div>
+</section>
+
+<!-- 11 -->
+<section id="s11" class="refs">
+  <h2><span class="n">11</span>근거 자료</h2>
+  <h3>현황 통계</h3>
+  <ul>
+    <li><a href="https://www.kyeonggi.com/article/20241218580136">경기일보, 1호선 개통 1년 성과 (2024.12.18)</a> — 관광객 173.9만 명, 평균 체류 4시간</li>
+    <li><a href="https://kyeonggi.com/article/20260708580181">경기일보, 2026 구석기축제 성과 (2026.7.8)</a> — 입장객·외지인 비율·1인 지출, 문화관광축제 지정</li>
+    <li>경기일보 (2026.7.30), 2026년 1분기 생활인구 — 연천 3개월 내 재방문율 50% 이상 (https://www.kyeonggi.com/article/20260730580217)</li>
+    <li><a href="https://www.kukinews.com/article/view/kuk202410150036">쿠키뉴스, 관광주민증 실사용률 (2024.10.15)</a> — 13.9% → 2.4%</li>
+  </ul>
+  <h3>운영 대상</h3>
+  <ul>
+    <li><a href="https://www.ktriptips.com/kor/leisure/1750300">한국관광 품질인증 정보, 연천승마공원</a></li>
+    <li><a href="https://www.kyeonggi.com/article/201902121042438">경기일보, 재인폭포 오토캠핑장 카트레이싱 (2019.2.12)</a></li>
+    <li><a href="https://www.newspim.com/news/view/20261001000701">뉴스핌, 연천군시설관리공단 운영 시설 (2026.10.1)</a></li>
+    <li><a href="https://www.kyeonggi.com/article/20240919580118">경기일보, 연천역 앞 광장 축제 (2024.9.19)</a></li>
+    <li><a href="https://mediahub.seoul.go.kr/archives/2009777">서울시 미디어허브, 연천행 전철 배차</a></li>
+    <li><a href="https://www.newspim.com/news/view/20260903000763">뉴스핌, 한탄강 수위 예측 (2026.9.3)</a></li>
+  </ul>
+  <h3>예산 단가</h3>
+  <ul>
+    <li><a href="https://www.waug.com/activities/143347">와그, 고프로12 풀세트 대여 1일 12,000원</a> / <a href="https://www.waug.com/ko/activities/134919">고프로12 대여, 기사 방문 수거</a></li>
+    <li><a href="https://www.e-himart.co.kr/app/goods/goodsDetail?goodsNo=0033180856">하이마트, 코닥 펀세이버27 27,900원</a> / <a href="https://www.wishbucket.io/items/104390">위시버킷, 24,800원</a></li>
+    <li><a href="https://choicemon.com/best-film-camera/">초이스몬, 일회용 카메라 현상·스캔 포함 비용</a></li>
+    <li><a href="https://www.heraldk.com/article/2025081814060701741">헤럴드경제, 남양주시 2026 생활임금 11,400원</a> / <a href="https://www.kukinews.com/article/view/kuk202509080147">쿠키뉴스, 의정부시 11,340원</a></li>
+    <li><a href="https://kuhj.korea.ac.kr/_res/kuhj/etc/%EB%8C%80%EA%B4%80%EB%A3%8C%EC%9A%94%EC%9C%A8%ED%91%9C.pdf">고려대 화정체육관 대관 요율표, 3×3m 부스 1일 3만 원</a></li>
+    <li><a href="https://miso.kr/blog/%EA%B0%95%EB%82%A8-%EA%B4%80%EA%B4%91-%EB%B2%84%EC%8A%A4-%EB%8C%80%EC%A0%88-%EC%98%88%EC%95%BD-%EB%B9%84%EC%9A%A9">미소, 25인승 버스 당일 대절 30~40만 원</a></li>
+    <li><a href="https://solapi.com/guides/tiered-pricing">솔라피, 알림톡 구간별 단가</a></li>
+    <li><a href="https://e-print.com.hk/en_products_pvc_card_MP-102">e-print, PVC 카드 수량별 단가 (3천 장 장당 HKD 0.69)</a> / <a href="https://uchangepromo.com/products/plastic-card-with-magnetic-stripe-and-barcodes">uchangepromo, 바코드 플라스틱 카드 (5천 장 장당 $0.49)</a></li>
+  </ul>
+  <h3>재원</h3>
+  <ul>
+    <li><a href="https://mobile.newsis.com/view/NISX20260227_0003528809">뉴시스, 지역사랑 휴가지원 시범사업 (2026.2.27)</a></li>
+    <li><a href="https://www.fnnews.com/news/202512030937251152">파이낸셜뉴스, 2026 지방소멸대응기금 개편 (2025.12.3)</a></li>
+    <li><a href="https://www.dailian.co.kr/news/view/1561701/">데일리안, 연천군 농어촌 기본소득 시범지역 (2025.10.20)</a></li>
+  </ul>
+  <h3>팀 검증 보고서 (14개 항목, 2026.11.13)</h3>
+  <ul class="tv">
+    <li><b>카트장:</b> 연천군시설관리공단 직영, 한국관광공사 고캠핑 부대시설 등재 (1인승 10분 1만~1.5만 원, 2인승 1.5만~2만 원)</li>
+    <li><b>카약:</b> 미산면 임진강 주상절리 카약, 관광주민증 가맹 / 연천 구간 한탄강 급류 래프팅 불가 (래프팅 업체는 철원) — 카약 업체 존재는 <a href="https://www.harpersbazaar.co.kr/article/49283">하퍼스바자</a>로 재확인</li>
+    <li><b>방문객:</b> 생활인구 50대 이상 52.3%, 데이터랩 연간 방문 20대 23.9%·50대 20.2%, 경기도 관광지 실태조사 동반 가족·친척 57.5%·연인 11.7%</li>
+    <li><b>조례:</b> 한탄강관광지 시설이용료징수 조례 제4조(비수기 평일 30% 범위 인하)·제5조(군민 등 20% 감경), 연천군 관광진흥 조례 제6조의2(관광 프로그램 참가자 기념품)</li>
+    <li><b>인허가:</b> 국가유산청 고시 제2024-103호(사적 내 경미한 가설물 군수 허가), 연천역 교통광장 도로점용(군 건설과)</li>
+    <li><b>알림톡:</b> 카카오 알림톡 심사 가이드 2026.11.1 개정 (신청 범위 밖 행사 안내는 반려)</li>
+    <li><b>단가:</b> 후지 퀵스냅 22,000원·코닥 펀세이버 23,000원(공식몰), 현상·스캔 롤당 5,000~8,500원, 연천군 2026 생활임금 11,300원, 셔틀 25인승 20만~44.2만 원</li>
+    <li><b>조직·재원:</b> 경제교통과 지역경제팀(지역화폐), 지역사랑 휴가지원 84개 대상 지역에 연천 포함</li>
+  </ul>
+  <p style="font-size:13px;color:var(--muted)">부스·셔틀 현지 견적과 액션캠 업체 수거 조건 견적은 계약 전 확인한다. "자체 가정"으로 표시한 항목은 근거 단가가 없는 추정치다.</p>
+</section>
+
+<footer>연천(連天) 패스 정책 제안서 · Nov 7, 2026 · @이동현</footer>
+</main>
+</div>
+
+<script>
+(function(){
+  var M=window.Motion||{}, G=window.gsap, ST=window.ScrollTrigger;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root=document.documentElement;
+  var okM=!reduce&&typeof M.animate==='function'&&typeof M.inView==='function';
+  var okG=!reduce&&!!G&&!!ST;
+  if(!okM) root.classList.remove('js-motion');
+  if(G&&ST) G.registerPlugin(ST);
+
+  /* 상단 진행바 */
+  var bar=document.getElementById('progress');
+  function prog(){var h=document.documentElement;var m=h.scrollHeight-h.clientHeight;bar.style.transform='scaleX('+(m>0?h.scrollTop/m:0)+')';}
+  if(okG){G.to(bar,{scaleX:1,ease:'none',scrollTrigger:{start:0,end:'max',scrub:.3}});}else{addEventListener('scroll',prog,{passive:true});prog();}
+
+  /* 등장 */
+  if(okM){
+    M.inView('.rv',function(el){
+      var c=M.animate(el,{opacity:[0,1],y:[18,0]},{duration:.55,ease:[.22,1,.36,1]});
+      var clean=function(){el.style.removeProperty('opacity');el.style.removeProperty('transform');el.classList.remove('rv');};
+      Promise.resolve(c).then(clean,clean);
+    },{amount:.12,margin:'0px 0px -5% 0px'});
+    setTimeout(function(){document.querySelectorAll('.rv').forEach(function(e){var r=e.getBoundingClientRect();if(r.top<innerHeight&&r.bottom>0){e.style.opacity=1;}});},4000);
+  }
+
+  /* 숫자 카운트업 */
+  function fmt(n,dec){var s=n.toFixed(dec).split('.');s[0]=s[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');return s.join('.');}
+  document.querySelectorAll('[data-count]').forEach(function(el){
+    var end=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0),final=el.textContent;
+    if(!okG){el.textContent=final;return;}
+    el.textContent=fmt(0,dec);
+    var o={v:0};
+    ST.create({trigger:el,start:'top 92%',once:true,onEnter:function(){
+      G.to(o,{v:end,duration:1.3,ease:'power3.out',onUpdate:function(){el.textContent=fmt(o.v,dec);},onComplete:function(){el.textContent=final;}});
+    }});
+  });
+
+  /* 막대·그래프 성장 */
+  if(okG){
+    document.querySelectorAll('.bar .tr i,.goalc .tr i,td .mini i').forEach(function(el){
+      var w=parseFloat(el.style.getPropertyValue('--w')); if(isNaN(w))w=1;
+      G.set(el,{scaleX:0,transformOrigin:'0 50%'});
+      ST.create({trigger:el,start:'top 94%',once:true,onEnter:function(){G.to(el,{scaleX:w,duration:1,ease:'power3.out'});}});
+    });
+    document.querySelectorAll('.steps3 .b').forEach(function(el,i){
+      var h=parseFloat(el.style.getPropertyValue('--h')); if(isNaN(h))h=1;
+      G.set(el,{scaleY:0});
+      ST.create({trigger:el,start:'top 94%',once:true,onEnter:function(){G.to(el,{scaleY:h,duration:.9,delay:i*.15,ease:'power3.out'});}});
+    });
+    var st=document.querySelectorAll('#stack i');
+    G.set(st,{scaleX:0});
+    ST.create({trigger:'#stack',start:'top 92%',once:true,onEnter:function(){G.to(st,{scaleX:1,duration:.7,stagger:.07,ease:'power2.out'});}});
+  }
+
+  /* 목차 하이라이트 */
+  var links=[].slice.call(document.querySelectorAll('nav.toc a'));
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(e.isIntersecting){links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id);});}
+    });},{rootMargin:'-20% 0px -70% 0px'});
+    document.querySelectorAll('section[id]').forEach(function(s){io.observe(s);});
+  }
+
+  /* 아코디언 */
+  document.getElementById('openAll').onclick=function(){document.querySelectorAll('details').forEach(function(d){d.open=true;});};
+  document.getElementById('closeAll').onclick=function(){document.querySelectorAll('details').forEach(function(d){d.open=false;});};
+  if(okM){document.querySelectorAll('details').forEach(function(d){
+    d.addEventListener('toggle',function(){if(d.open){var a=d.querySelector('.a');M.animate(a,{opacity:[0,1],y:[-6,0]},{duration:.25});}});
+  });}
+})();
+</script>
+</body>
+</html>

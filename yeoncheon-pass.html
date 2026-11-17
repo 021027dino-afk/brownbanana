@@ -217,6 +217,23 @@ footer{border-top:1px solid var(--line);margin-top:56px;padding-top:16px;font-si
   section{break-inside:avoid-page}.tw{break-inside:avoid}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* search */
+#sx{position:fixed;top:12px;right:16px;z-index:60;width:min(340px,calc(100vw - 32px));font-size:14px}
+#sx .box{display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);box-shadow:0 4px 18px rgba(27,31,30,.12);padding:0 12px;height:40px}
+#sx .box:focus-within{border-color:var(--accent)}
+#sx input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;color:var(--ink)}
+#sx kbd{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);border:1px solid var(--line);padding:0 5px;border-radius:3px}
+#sx ul{list-style:none;margin:6px 0 0;padding:0;max-height:min(60vh,420px);overflow:auto;background:var(--paper);border:1px solid var(--line);box-shadow:0 8px 24px rgba(27,31,30,.16);display:none}
+#sx.open ul{display:block}
+#sx li{padding:9px 12px;cursor:pointer;border-top:1px solid var(--line);line-height:1.5}
+#sx li:first-child{border-top:0}
+#sx li:hover,#sx li.act{background:var(--accent-soft)}
+#sx li small{display:block;font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.04em}
+#sx li span{font-size:13px;color:var(--ink)}
+#sx mark,.sfound mark{background:var(--amber-soft);color:inherit;padding:0 1px}
+#sx .empty{padding:12px;color:var(--muted);font-size:13px;cursor:default}
+.sflash{outline:2px solid var(--amber);outline-offset:3px;background:var(--amber-soft)!important;transition:outline-color .6s}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/motion@14.13.0/dist/motion.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.1/dist/gsap.min.js"></script>
@@ -224,6 +241,8 @@ footer{border-top:1px solid var(--line);margin-top:56px;padding-top:16px;font-si
 </head>
 <body>
 <div id="progress"></div>
+<div id="sx" role="search"><label class="box"><span aria-hidden="true">🔍</span><input id="sq" type="search" placeholder="본문 검색 (예: 알림톡, 예산)" autocomplete="off" aria-label="본문 검색"><kbd>/</kbd></label><ul id="sr" role="listbox"></ul></div>
+
 <div class="shell">
 
 <nav class="toc" aria-label="목차">
@@ -245,7 +264,7 @@ footer{border-top:1px solid var(--line);margin-top:56px;padding-top:16px;font-si
 <header class="hero">
   <div class="eyebrow"><i></i><span>POLICY PROPOSAL</span></div>
   <h1>연천(連天) 패스 정책 제안서</h1>
-  <div class="meta"><span>Nov 7, 2026</span><span>@이동현</span></div>
+  <div class="meta"><span>Nov 7, 2026</span><span>@이동연</span></div>
 </header>
 
 <!-- 1 -->
@@ -615,7 +634,7 @@ footer{border-top:1px solid var(--line);margin-top:56px;padding-top:16px;font-si
   <p style="font-size:13px;color:var(--muted)">부스·셔틀 현지 견적과 액션캠 업체 수거 조건 견적은 계약 전 확인한다. "자체 가정"으로 표시한 항목은 근거 단가가 없는 추정치다.</p>
 </section>
 
-<footer>연천(連天) 패스 정책 제안서 · Nov 7, 2026 · @이동현</footer>
+<footer>연천(連天) 패스 정책 제안서 · Nov 7, 2026 · @이동연</footer>
 </main>
 </div>
 
@@ -707,6 +726,70 @@ footer{border-top:1px solid var(--line);margin-top:56px;padding-top:16px;font-si
   if(okM){document.querySelectorAll('details').forEach(function(d){
     d.addEventListener('toggle',function(){if(d.open){var a=d.querySelector('.a');M.animate(a,{opacity:[0,1],y:[-6,0]},{duration:.25});}});
   });}
+})();
+</script>
+<script>
+(function(){
+  var sx=document.getElementById('sx'),q=document.getElementById('sq'),ul=document.getElementById('sr');
+  var sel='h2,h3,p,li,tr,summary,.kpi,.cause>div,.flow .s,.phase .p,.note,.goalc,.compare .r,details .a';
+  var items=[];
+  function build(){
+    items=[];
+    document.querySelectorAll('main section').forEach(function(sec){
+      var h=sec.querySelector('h2'),sname=h?h.textContent.replace(/\s+/g,' ').trim().replace(/^(\d+)\s*/,'$1. '):'';
+      sec.querySelectorAll(sel).forEach(function(el){
+        if(el.closest('#sx'))return;
+        if(el.matches('tr')&&el.closest('thead'))return;
+        if(el.matches('li,p,.note,.kpi')&&el.querySelector('li,p'))return;
+        var t=el.textContent.replace(/\s+/g,' ').trim();
+        if(t.length<2)return;
+        items.push({el:el,t:t,l:t.toLowerCase(),s:sname});
+      });
+    });
+  }
+  function esc(x){return x.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]});}
+  var cur=-1,shown=[];
+  function render(){
+    var v=q.value.trim().toLowerCase();ul.innerHTML='';cur=-1;shown=[];
+    if(!v){sx.classList.remove('open');return;}
+    if(!items.length)build();
+    var seen={};
+    for(var i=0;i<items.length&&shown.length<30;i++){
+      var it=items[i],k=it.l.indexOf(v);if(k<0)continue;
+      var key=it.s+'|'+it.t.slice(0,60);if(seen[key])continue;seen[key]=1;
+      shown.push(it);
+      var a=Math.max(0,k-24),b=Math.min(it.t.length,k+v.length+60);
+      var pre=esc(it.t.slice(a,k)),mid=esc(it.t.slice(k,k+v.length)),post=esc(it.t.slice(k+v.length,b));
+      var li=document.createElement('li');li.setAttribute('role','option');
+      li.innerHTML='<small>'+esc(it.s)+'</small><span>'+(a>0?'…':'')+pre+'<mark>'+mid+'</mark>'+post+(b<it.t.length?'…':'')+'</span>';
+      (function(it){li.addEventListener('mousedown',function(e){e.preventDefault();go(it);});})(it);
+      ul.appendChild(li);
+    }
+    if(!shown.length){var e=document.createElement('li');e.className='empty';e.textContent='검색 결과가 없습니다';ul.appendChild(e);}
+    sx.classList.add('open');
+  }
+  function go(it){
+    var el=it.el,d=el.closest('details');if(d)d.open=true;
+    document.querySelectorAll('.sflash').forEach(function(x){x.classList.remove('sflash');});
+    var r=el.closest('.rv')||el;r.style.opacity=1;r.style.transform='none';
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    el.classList.add('sflash');setTimeout(function(){el.classList.remove('sflash');},3500);
+    sx.classList.remove('open');q.blur();
+  }
+  function mark(n){var li=ul.querySelectorAll('li:not(.empty)');if(!li.length)return;if(cur>=0)li[cur].classList.remove('act');cur=(n+li.length)%li.length;li[cur].classList.add('act');li[cur].scrollIntoView({block:'nearest'});}
+  q.addEventListener('input',render);
+  q.addEventListener('focus',function(){if(q.value)render();});
+  q.addEventListener('blur',function(){setTimeout(function(){sx.classList.remove('open');},150);});
+  q.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){e.preventDefault();mark(cur+1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();mark(cur-1);}
+    else if(e.key==='Enter'){e.preventDefault();var i=cur<0?0:cur;if(shown[i])go(shown[i]);}
+    else if(e.key==='Escape'){q.value='';sx.classList.remove('open');q.blur();}
+  });
+  document.addEventListener('keydown',function(e){
+    var t=e.target.tagName;
+    if((e.key==='/'&&t!=='INPUT'&&t!=='TEXTAREA')||((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k')){e.preventDefault();q.focus();q.select();}
+  });
 })();
 </script>
 </body>

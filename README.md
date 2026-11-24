@@ -10,8 +10,11 @@ Claude Code 세션 구성(스킬 + 플러그인)을 보관하는 저장소입니
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | 스타일·팔레트·폰트·UX 가이드 검색 DB |
 | impeccable | pbakaus/impeccable | 기존 UI 진단·비평·다듬기 |
 | canvas-design | anthropics/skills | 포스터·아트 PNG/PDF 제작 (한글 폰트 Pretendard, Noto Serif KR 추가) |
+| huashu-design (정리본) | alchaincyf/huashu-design v3.5.0 | 슬라이드·편집 가능한 PPTX, 애니메이션·영상(MP4/GIF), App Store 홍보 이미지, 샤오훙수 카드, 위챗 미니프로그램 |
 
 출처와 해시는 `skills-lock.json`에 있습니다. 갱신: `npx skills add <저장소> --skill <이름>`
+
+huashu-design은 기존 스킬과 겹치는 모듈(웹·랜딩·대시보드, 앱 프로토타입 화면, 인포그래픽, 디자인 평가)과 데모·쇼케이스를 빼고 넣은 정리본이라 `skills-lock.json`에 넣지 않았습니다. `npx skills add`로 갱신하면 원본 전체가 다시 설치되므로, 갱신할 때는 원본을 받은 뒤 같은 모듈을 다시 빼야 합니다.
 
 ## 플러그인 (`.claude/settings.json`)
 

@@ -24,5 +24,8 @@
         "repo": "epoko77-ai/im-not-ai"
       }
     }
-  }
+  },
+  "enabledMcpjsonServers": [
+    "chrome-devtools"
+  ]
 }

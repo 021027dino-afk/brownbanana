@@ -19,6 +19,14 @@ Claude Code 세션 구성(스킬 + 플러그인)을 보관하는 저장소입니
 - code-review, code-simplifier, commit-commands, feature-dev, hookify, plugin-dev, pr-review-toolkit, security-guidance, skill-creator
 - humanize-korean (한국어 AI 티 제거)
 
+## MCP 서버 (`.mcp.json`)
+
+| 서버 | 출처 | 용도 |
+|---|---|---|
+| chrome-devtools | ChromeDevTools/chrome-devtools-mcp | 브라우저 조작·스크린샷·콘솔/네트워크 확인·성능 트레이스·Lighthouse |
+
+`scripts/chrome-devtools-mcp.sh`로 실행합니다. 로컬에서는 설치된 Chrome을 쓰고, 클라우드 세션에서는 내장 Chromium을 헤드리스로 띄웁니다.
+
 ## 원칙
 
 기능이 겹치는 스킬·플러그인은 설치하지 않습니다.

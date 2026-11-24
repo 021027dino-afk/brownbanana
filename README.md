@@ -11,6 +11,7 @@ Claude Code 세션 구성(스킬 + 플러그인)을 보관하는 저장소입니
 | impeccable | pbakaus/impeccable | 기존 UI 진단·비평·다듬기 |
 | canvas-design | anthropics/skills | 포스터·아트 PNG/PDF 제작 (한글 폰트 Pretendard, Noto Serif KR 추가) |
 | huashu-design (정리본) | alchaincyf/huashu-design v3.5.0 | 슬라이드·편집 가능한 PPTX, 애니메이션·영상(MP4/GIF), App Store 홍보 이미지, 샤오훙수 카드, 위챗 미니프로그램 |
+| mineru | opendatalab/MinerU | PDF·스캔 이미지·오피스 문서를 Markdown으로 변환하고 OCR (표·수식, 긴 문서 이어 읽기). 실행에 필요한 `mineru` 패키지는 처음 쓸 때 설치. 텔레메트리는 `.claude/settings.json`의 `MINERU_TELEMETRY_DISABLED=1`로 끔 |
 
 출처와 해시는 `skills-lock.json`에 있습니다. 갱신: `npx skills add <저장소> --skill <이름>`
 

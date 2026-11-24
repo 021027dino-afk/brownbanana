@@ -19,6 +19,13 @@
       "skillPath": ".agents/skills/impeccable/SKILL.md",
       "computedHash": "2b16bd26632e294094da7e6d2352dce4c1efec66d3b90c88f0e059b28e2d6e04"
     },
+    "mineru": {
+      "source": "opendatalab/MinerU",
+      "commit": "097de7f63f54722c9b805ee1c9a14a0c5b02e078",
+      "sourceType": "github",
+      "skillPath": "skills/mineru/SKILL.md",
+      "computedHash": "4623f96429e35abc1a9ecfaf2c8e5eb1599c3a00780d2b67f239d19e7e508e7a"
+    },
     "ui-ux-pro-max": {
       "source": "nextlevelbuilder/ui-ux-pro-max-skill",
       "commit": "e8b065f0f3aaf2e680fd125f000e4f5e351ed108",

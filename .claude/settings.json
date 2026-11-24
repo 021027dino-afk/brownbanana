@@ -35,5 +35,8 @@
   },
   "enabledMcpjsonServers": [
     "chrome-devtools"
-  ]
+  ],
+  "env": {
+    "MINERU_TELEMETRY_DISABLED": "1"
+  }
 }

@@ -16,9 +16,10 @@ Claude Code 세션 구성(스킬 + 플러그인)을 보관하는 저장소입니
 
 ## 플러그인 (`.claude/settings.json`)
 
-- 마켓플레이스: `anthropics/claude-plugins-official`, `epoko77-ai/im-not-ai`, `morluto/rea`
+- 마켓플레이스: `anthropics/claude-plugins-official`, `epoko77-ai/im-not-ai`, `morluto/rea`, `heygen-com/hyperframes`
 - code-review, code-simplifier, commit-commands, feature-dev, hookify, plugin-dev, pr-review-toolkit, security-guidance, skill-creator
 - humanize-korean (한국어 AI 티 제거)
+- hyperframes (HTML로 영상 만들고 MP4 렌더링: 자막, 음성, 슬라이드쇼, Figma·Remotion 변환 등 스킬 9개)
 - rea (리버스 엔지니어링 MCP + 조사 스킬: 네이티브 바이너리, JS/Electron 앱, .NET, 웹사이트, Android 분석)
 
 ## MCP 서버 (`.mcp.json`)

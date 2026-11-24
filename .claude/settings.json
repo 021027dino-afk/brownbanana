@@ -10,7 +10,8 @@
     "plugin-dev@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
     "humanize-korean@im-not-ai": true,
-    "rea@rea": true
+    "rea@rea": true,
+    "hyperframes@hyperframes": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -30,6 +31,13 @@
         "source": "github",
         "repo": "morluto/rea",
         "ref": "6d408c048006c54f7e4ca371e78caee3f0d6c43a"
+      }
+    },
+    "hyperframes": {
+      "source": {
+        "source": "github",
+        "repo": "heygen-com/hyperframes",
+        "ref": "v0.9.87"
       }
     }
   },

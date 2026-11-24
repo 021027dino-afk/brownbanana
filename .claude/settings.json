@@ -9,7 +9,8 @@
     "skill-creator@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
-    "humanize-korean@im-not-ai": true
+    "humanize-korean@im-not-ai": true,
+    "rea@rea": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -23,6 +24,16 @@
         "source": "github",
         "repo": "epoko77-ai/im-not-ai"
       }
+    },
+    "rea": {
+      "source": {
+        "source": "github",
+        "repo": "morluto/rea",
+        "ref": "6d408c048006c54f7e4ca371e78caee3f0d6c43a"
+      }
     }
-  }
+  },
+  "enabledMcpjsonServers": [
+    "chrome-devtools"
+  ]
 }

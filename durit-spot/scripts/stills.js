@@ -9,7 +9,7 @@ const path = require('path');
   await p.goto('file://' + path.resolve(__dirname, '../' + (process.env.PAGE || 'spot.html')) + (process.env.QS || ''));
   await p.evaluate(() => window.ready);
   for (const t of times) {
-    await p.evaluate(t => window.render(t), parseFloat(t));
+    await p.evaluate(async t => { if (window.prepare) await window.prepare(t); window.render(t); }, parseFloat(t));
     await p.screenshot({ path: `${outDir}/t${t}.png` });
   }
   await b.close();

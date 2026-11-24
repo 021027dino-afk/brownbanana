@@ -20,7 +20,7 @@ const path = require('path');
   await page.goto('file://' + path.resolve(__dirname, '../' + (process.env.PAGE || 'spot.html')));
   await page.evaluate(() => window.ready);
   for (let i = 0; i < frames; i++) {
-    const b64 = await page.evaluate(t => { window.render(t); return document.getElementById('c').toDataURL('image/jpeg', 0.95).split(',')[1]; }, i / fps);
+    const b64 = await page.evaluate(async t => { if (window.prepare) await window.prepare(t); window.render(t); return document.getElementById('c').toDataURL('image/jpeg', 0.95).split(',')[1]; }, i / fps);
     if (!ff.stdin.write(Buffer.from(b64, 'base64'))) await new Promise(r => ff.stdin.once('drain', r));
     if (i % 90 === 0) console.log(`frame ${i}/${frames}`);
   }

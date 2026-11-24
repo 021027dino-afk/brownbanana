@@ -47,3 +47,20 @@ PAGE=spot2.html node scripts/render.js out/DURIT_30s_v2_photo.mp4 out/durit_audi
 ```
 
 Motion comes from camera moves plus light passes on still plates: ring light, LED on/off, the press ring, ripples, the streak wipe, red lines and the jaw trace, beams and glows. The turntable in CUT 2, the pick-up in CUT 3 and the head glides in CUT 5 and 7 need real footage or image-to-video plates; slow dollies stand in for them for now.
+
+## v3: moving plates from Higgsfield
+
+`out/DURIT_30s_v3_motion.mp4` (`spot3.html`) swaps CUT 2, 3, 5 and 7 for 1080p Seedance 2.5 clips in `clips/raw/`, each generated from a reference still as the first frame with the product photo as a reference:
+
+- c2: turntable orbit
+- c3: she raises the device
+- c5: cheek → jaw glide
+- c7: chin → ear lift
+
+`scripts/track_clips.py` tracks the contact light in c5 and c7, so the ripples, the converging red lines and the lifting trace follow the moving head.
+
+```bash
+for c in c2 c3 c5 c7; do mkdir -p clips/$c && ffmpeg -i clips/raw/$c.mp4 -q:v 2 clips/$c/%04d.jpg; done
+python3 scripts/track_clips.py
+PAGE=spot3.html node scripts/render.js out/DURIT_30s_v3_motion.mp4 out/durit_audio.wav 30
+```

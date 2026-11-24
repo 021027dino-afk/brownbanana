@@ -1,0 +1,225 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'Syne';font-weight:800;src:url(fonts/Syne-800.ttf)}
+@font-face{font-family:'NotoKR';font-weight:600;src:url(fonts/NotoSansKR-600.ttf)}
+@font-face{font-family:'NotoKR';font-weight:700;src:url(fonts/NotoSansKR-700.ttf)}
+html,body{margin:0;background:#050607}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// DURIT 30s spot, v2: built on the reference stills (plates/), with camera moves and light passes.
+const W=1080,H=1920,cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const C={gold:'#D6B05A',green:'#8FE02A',black:'#050607',blueDeep:'#071C4A',blueDark:'#020817',wave:'#4A95FF',redDeep:'#3C0710',redDark:'#140205',line:'#FF3A46'};
+const DEBUG=new URLSearchParams(location.search).has('debug');
+
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),lerp=(a,b,u)=>a+(b-a)*u;
+const eo=u=>1-Math.pow(1-clamp(u),3), eo2=u=>1-Math.pow(1-clamp(u),2);
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+function hexA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+
+// ---- plates ----
+const NAMES=['p01','p02','p02_key','p03','p04','p05','p06','p06_blue','p07','p08','p09','p10','p10_bgmask','p11','p11_key'];
+const IMG={};
+// moving plates generated with Higgsfield (Seedance 2.5), extracted to clips/<name>/NNNN.jpg
+let CLIPS={};const FR={};const FCACHE=new Map();
+// [cutStart, cutEnd, clip, localTime -> clip time (s)]
+const CLIPMAP=[
+  [3,6,'c2',lt=>Math.min(4.0,lt*1.6)],
+  [6,8,'c3',lt=>0.8+lt*1.4],
+  [10,15,'c5',lt=>lt],
+  [17,22,'c7',lt=>lt],
+];
+function loadImg(src){if(FCACHE.has(src))return FCACHE.get(src);const p=new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});FCACHE.set(src,p);
+  if(FCACHE.size>40)FCACHE.delete(FCACHE.keys().next().value);return p;}
+window.prepare=async t=>{for(const [a,b,name,map] of CLIPMAP){if(t<a||t>=b||!CLIPS[name])continue;const c=CLIPS[name];
+  const k=Math.max(0,Math.min(c.n-1,Math.round(map(t-a)*c.fps)));FR[name]=await loadImg(`clips/${name}/${String(k+1).padStart(4,'0')}.jpg`);}};
+const clipOr=(name,fallback)=>FR[name]?'@'+name:fallback;
+const loads=NAMES.map(n=>new Promise(r=>{const i=new Image();i.onload=r;i.src='plates/'+n+(/_key|_bgmask/.test(n)?'.png':'.jpg');IMG[n]=i;}));
+
+// Camera: image point (fx,fy) at screen point (sx,sy), scale s; clamped so the plate always covers the frame.
+function cam(s,fx,fy,sx=540,sy=960){
+  const minX=sx/s, maxX=W-(W-sx)/s, minY=sy/s, maxY=H-(H-sy)/s;
+  fx=clamp(fx,minX,maxX);fy=clamp(fy,minY,maxY);
+  return {s,fx,fy,sx,sy};
+}
+function apply(c){ctx.translate(c.sx,c.sy);ctx.scale(c.s,c.s);ctx.translate(-c.fx,-c.fy);}
+function plate(name,c,alpha=1){const im=name[0]==='@'?FR[name.slice(1)]:IMG[name];ctx.save();apply(c);ctx.globalAlpha=alpha;ctx.drawImage(im,0,0);ctx.restore();}
+function within(c,fn){ctx.save();apply(c);fn();ctx.restore();}
+function vignette(a,col='5,6,7',r0=420,r1=1250,cx=540,cy=960){
+  const v=ctx.createRadialGradient(cx,cy,r0,cx,cy,r1);v.addColorStop(0,`rgba(${col},0)`);v.addColorStop(1,`rgba(${col},${a})`);ctx.fillStyle=v;ctx.fillRect(0,0,W,H);}
+function glow(x,y,r,col,a){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,hexA(col,a));g.addColorStop(1,hexA(col,0));ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r);}
+function mark(x,y,l){if(!DEBUG)return;ctx.save();ctx.strokeStyle='#0f0';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,10,0,7);ctx.stroke();ctx.fillStyle='#0f0';ctx.font='20px monospace';ctx.fillText(l||'',x+12,y);ctx.restore();}
+
+// ---- captions (safe area 330–1280 px, ≥90 px left, ≥140 px right) ----
+function caption(t,t0,tag,main,o={}){
+  if(t<t0)return;const p=eo((t-t0)/0.45),x=90,y=o.y||430,maxW=W-90-140;
+  ctx.save();ctx.globalAlpha=p;ctx.translate(0,(1-p)*26);ctx.textAlign='left';
+  ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=24;
+  ctx.font='600 30px NotoKR';ctx.letterSpacing='7px';ctx.fillStyle=o.tagColor||C.gold;ctx.fillText(tag.toUpperCase(),x,y);
+  ctx.shadowBlur=0;ctx.fillStyle=hexA(o.tagColor||C.gold,.7);ctx.fillRect(x,y+18,48,2);ctx.shadowBlur=24;
+  let size=o.size||(o.en?132:64);const f=()=>ctx.font=o.en?`800 ${size}px Syne`:`700 ${size}px NotoKR`;f();
+  ctx.letterSpacing=o.en?'2px':'0px';
+  while(ctx.measureText(main).width>maxW&&size>30){size-=2;f();}
+  ctx.fillStyle='#F2F3F4';ctx.fillText(main,x,y+38+size*(o.en?.92:1.05));ctx.restore();
+}
+
+// ---- light passes ----
+function ledGlow(x,y,col,v,k=1){if(v<=0)return;ctx.save();ctx.globalCompositeOperation='lighter';
+  glow(x,y,34*k,col,.55*v);ctx.beginPath();ctx.arc(x,y,7*k,0,7);ctx.fillStyle=hexA(col,.9*v);ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,3.2*k,0,7);ctx.fillStyle=`rgba(255,255,255,${.9*v})`;ctx.fill();ctx.restore();}
+function ledOff(x,y,k=1){ // cover a lit LED with the unlit handle look: green halo + dark pinhole
+  ctx.save();const g=ctx.createRadialGradient(x,y,0,x,y,26*k);g.addColorStop(0,'rgba(104,190,24,1)');g.addColorStop(.55,'rgba(110,196,26,.9)');g.addColorStop(1,'rgba(110,196,26,0)');
+  ctx.fillStyle=g;ctx.fillRect(x-26*k,y-26*k,52*k,52*k);ctx.beginPath();ctx.arc(x,y,5.5*k,0,7);ctx.fillStyle='#1d2a0e';ctx.fill();ctx.restore();}
+function ringPulse(x,y,t,t0,r0){if(t<t0||t>t0+.7)return;const k=eo((t-t0)/.65);ctx.save();ctx.beginPath();ctx.arc(x,y,r0+k*170,0,7);
+  ctx.strokeStyle=`rgba(255,255,255,${.85*(1-k)})`;ctx.lineWidth=2.2;ctx.stroke();ctx.restore();}
+function ripples(t,t0,t1,cx,cy,ang,col){ // soft curved ripple every 0.28 s from the contact point, 1.9 s fade
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  for(let b=t0;b<=Math.min(t,t1);b+=0.28){const q=(t-b)/1.9;if(q>1)continue;const r=16+230*eo(q);
+    ctx.beginPath();ctx.ellipse(cx,cy,r,r*.6,ang,-1.9,1.9);ctx.strokeStyle=hexA(col,.7*Math.pow(1-q,1.6));ctx.lineWidth=3.4*(1-q)+.8;ctx.stroke();}
+  ctx.restore();}
+const LINES=[...Array(15)].map((_,i)=>({x:-80+i*95+((i*37)%29)-14,ph:(i*0.137)%0.5,len:110+((i*53)%70)}));
+function redLines(t,cx,cy,baseY,spread=1){ctx.save();ctx.globalCompositeOperation='lighter';
+  LINES.forEach(l=>{const sx=cx+(l.x-540)*spread,sy=baseY,dx=cx-sx,dy=cy-sy,L=Math.hypot(dx,dy);
+    ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(cx,cy);ctx.strokeStyle=hexA(C.line,.06);ctx.lineWidth=1;ctx.stroke();
+    const ph=((t+l.ph)%0.5)/0.5,a=ph*L,b=Math.min(L,a+l.len);
+    ctx.beginPath();ctx.moveTo(sx+dx*a/L,sy+dy*a/L);ctx.lineTo(sx+dx*b/L,sy+dy*b/L);ctx.strokeStyle=hexA(C.line,.85*(1-ph*.35));ctx.lineWidth=1.8;ctx.stroke();});
+  ctx.restore();}
+
+// ===================== CUTS =====================
+// CUT 1 0–3 PRODUCT REVEAL: head rises out of black, slow L→R slide, rings light centre→steel→gold
+const HEAD1={x:560,y:870,rot:-.42,rings:[[150,112],[258,196],[392,300]]};
+function cut1(t){
+  ctx.fillStyle=C.black;ctx.fillRect(0,0,W,H);
+  const s=lerp(1.16,1.12,eo(seg(t,0,3))), fx=lerp(470,630,eo(seg(t,-0.05,3)));
+  const c=cam(s,fx,900);plate('p01',c,eo(seg(t,0,1.4)));
+  const lit=[eo(seg(t,0.5,0.95)),eo(seg(t,0.95,1.4)),eo(seg(t,1.4,1.85))];
+  within(c,()=>{ctx.save();ctx.translate(HEAD1.x,HEAD1.y);ctx.rotate(HEAD1.rot);ctx.globalCompositeOperation='lighter';
+    HEAD1.rings.forEach(([rx,ry],i)=>{const v=lit[i];if(v<=0)return;const [px,py]=i?HEAD1.rings[i-1]:[0,0];
+      ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);if(i)ctx.ellipse(0,0,px+6,py+5,0,Math.PI*2,0,true);
+      ctx.fillStyle=`rgba(255,214,140,${.16*v})`;ctx.fill();
+      ctx.beginPath();ctx.ellipse(0,0,rx-3,ry-3,0,0,Math.PI*2);ctx.strokeStyle=`rgba(255,238,200,${.55*v*(1-.5*clamp((t-1.9)/1))})`;ctx.lineWidth=2;ctx.stroke();});
+    ctx.restore();if(DEBUG){ctx.save();ctx.translate(HEAD1.x,HEAD1.y);ctx.rotate(HEAD1.rot);ctx.strokeStyle='#0f0';HEAD1.rings.forEach(([a,b])=>{ctx.beginPath();ctx.ellipse(0,0,a,b,0,0,7);ctx.stroke();});ctx.restore();}});
+  vignette(lerp(1,.75,eo(seg(t,0,1.6))),'5,6,7',lerp(120,420,eo(seg(t,0,1.6))),1150);
+  caption(t,0.5,'duflow DURIT','하나의 기기, 두 개의 모드');
+}
+// CUT 2 3–6 PRODUCT DETAIL: real turntable orbit (Higgsfield clip), settles front-on at 5.5, green arcs behind
+function cut2(t){
+  ctx.fillStyle='#030304';ctx.fillRect(0,0,W,H);
+  const s=lerp(.80,.83,eo(seg(t,2.95,6))), c={s,fx:540,fy:1920,sx:540,sy:1890};
+  ctx.save();ctx.globalCompositeOperation='lighter';const a=eo(seg(t,3,4.2));
+  [[300,.9],[390,.55],[480,.32]].forEach(([r,k])=>{ctx.beginPath();ctx.ellipse(540,1010,r,r*1.12,0,Math.PI*1.08,Math.PI*1.92);
+    ctx.strokeStyle=hexA(C.green,.55*k*a);ctx.lineWidth=2.4;ctx.shadowColor=C.green;ctx.shadowBlur=18;ctx.stroke();});ctx.restore();
+  ctx.save();ctx.globalCompositeOperation='lighten';plate('@c2',c);ctx.restore();
+  // feather the clip's edges into black
+  vignette(.95,'3,3,4',330,760,540,1080);caption(t,3.3,'Design','120° 밀착 설계');
+}
+// CUT 3 6–8 THE USER: she brings DURIT up to her face (Higgsfield clip), slight push-in
+function cut3(t){const u=eo(seg(t,5.95,8));plate('@c3',cam(lerp(1.0,1.05,u),540,lerp(960,930,u)));}
+// CUT 4 8–10 BLUE MODE ON: fixed macro, press 8.4, LEDs 8.55/8.85/9.15, edges wash blue from 8.5
+const LED4=[[522,931],[563,946],[605,961]],PWR4=[518,1062];
+function cut4(t){
+  const c=cam(lerp(1.06,1.08,eo(seg(t,7.95,10))),560,1000);
+  const press=(t>=8.4&&t<8.55)?1:0;
+  ctx.fillStyle=C.black;ctx.fillRect(0,0,W,H);
+  within(c,()=>{if(press){ctx.translate(PWR4[0],PWR4[1]);ctx.scale(.996,.996);ctx.translate(-PWR4[0],-PWR4[1]);}
+    ctx.drawImage(IMG.p04,0,0);
+    const on=[seg(t,8.55,8.68),seg(t,8.85,8.98),seg(t,9.15,9.28)];
+    LED4.forEach(([x,y],i)=>{ledOff(x,y);ledGlow(x,y,C.wave,eo(on[i]));});
+    ringPulse(PWR4[0],PWR4[1],t,8.4,58);mark(...PWR4,'pwr');});
+  const w=eo(seg(t,8.5,9.6));
+  vignette(lerp(.92,.15,w),'5,6,7',380,1150);
+  vignette(.85*w,'7,28,74',520,1250);
+  caption(t,8.25,'Mode 01','BLUE MODE',{en:true,tagColor:'#9cc4ff'});
+}
+// CUT 5 10–15 BLUE CARE: head glides cheek→jaw (Higgsfield clip); ripples follow the tracked contact point
+function trackAt(name,ct){const tr=CLIPS[name].track,k=Math.max(0,Math.min(tr.length-1,ct*24));const i=Math.floor(k),f=k-i,a=tr[i],b=tr[Math.min(tr.length-1,i+1)];return [lerp(a[0],b[0],f),lerp(a[1],b[1],f)];}
+function cut5(t){
+  const u=eo2(seg(t,9.95,15)), c=cam(lerp(1.02,1.07,u),540,960);
+  plate('@c5',c);
+  within(c,()=>{ctx.save();ctx.globalCompositeOperation='lighter';
+    for(let b=10.0;b<=t;b+=0.28){const q=(t-b)/1.9;if(q>1)continue;const [x,y]=trackAt('c5',b-10);const r=16+220*eo(q);
+      ctx.beginPath();ctx.ellipse(x+10,y,r,r*.6,Math.PI-.35,-1.9,1.9);ctx.strokeStyle=hexA(C.wave,.6*Math.pow(1-q,1.6));ctx.lineWidth=3*(1-q)+.8;ctx.stroke();}
+    const [cx,cy]=trackAt('c5',t-10);glow(cx+20,cy,150,C.wave,.16);ctx.restore();mark(cx,cy,'contact');});
+  vignette(lerp(.35,.75,u),'7,28,74',lerp(700,520,u),1300);
+  caption(t,10.4,'Blue','파장+파동 | 붓기·윤곽 케어',{tagColor:'#9cc4ff'});
+}
+// CUT 6 15–17 MODE SWITCH: press 15.3, LEDs red 15.45, diagonal streak 15.5–16.05 turns the world red, zoom-out 16.0–16.9
+const LED6=[[485,937],[533,952],[582,968]],PWR6=[505,1092];
+function cut6(t){
+  const z=eo(seg(t,15.95,16.9)), c=cam(lerp(1.55,1.0,z),lerp(540,540,z),lerp(1000,960,z));
+  const D=Math.hypot(W,H), ang=Math.atan2(H,W), sw=eo(seg(t,15.5,16.05)), pos=lerp(-D*.55,D*.6,sw);
+  ctx.fillStyle=C.black;ctx.fillRect(0,0,W,H);
+  const press=(t>=15.3&&t<15.45)?1:0;
+  const drawWorld=(name,leds)=>within(c,()=>{if(press){ctx.translate(PWR6[0],PWR6[1]);ctx.scale(.996,.996);ctx.translate(-PWR6[0],-PWR6[1]);}
+    ctx.drawImage(IMG[name],0,0);LED6.forEach(([x,y])=>{ledOff(x,y);ledGlow(x,y,leds,1);});
+    ringPulse(PWR6[0],PWR6[1],t,15.3,58);mark(...PWR6,'pwr');});
+  const ledCol=t>=15.45?C.line:C.wave;
+  drawWorld('p06_blue',ledCol);
+  if(t>=15.5){ctx.save();ctx.translate(W/2,H/2);ctx.rotate(ang);ctx.beginPath();ctx.rect(-D,-D,D+pos,2*D);ctx.clip();ctx.rotate(-ang);ctx.translate(-W/2,-H/2);
+    drawWorld('p06',ledCol);ctx.restore();}
+  if(t>=15.5&&t<=16.08){ctx.save();ctx.translate(W/2,H/2);ctx.rotate(ang);ctx.globalCompositeOperation='lighter';
+    const g=ctx.createLinearGradient(pos-46,0,pos+4,0);g.addColorStop(0,'rgba(255,58,70,0)');g.addColorStop(.8,'rgba(255,58,70,.85)');g.addColorStop(1,'rgba(255,255,255,1)');
+    ctx.fillStyle=g;ctx.fillRect(pos-46,-D,50,2*D);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fillRect(pos,-D,3,2*D);ctx.restore();}
+  vignette(.55);caption(t,15.5,'Mode 02','RED MODE',{en:true,tagColor:'#ff8a90'});
+}
+// CUT 7 17–22 RED CARE: head lifts chin→ear (Higgsfield clip); 15 lines converge on the tracked contact, lifting trace behind it
+function cut7(t){
+  if(t>=19.55&&t<20.45)return cut7insert(t);
+  const lt=t-17, c=cam(1.04,540,960);plate('@c7',c);
+  within(c,()=>{const [cx,cy]=trackAt('c7',lt);redLines(t,cx-10,cy,1750,.9);
+    ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';ctx.beginPath();
+    for(let k=0;k<=24;k++){const p=trackAt('c7',Math.max(0,lt-0.9+k*0.9/24));k?ctx.lineTo(p[0]-18,p[1]+14):ctx.moveTo(p[0]-18,p[1]+14);}
+    ctx.strokeStyle=hexA(C.line,.4);ctx.lineWidth=9;ctx.shadowColor=C.line;ctx.shadowBlur=22;ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='rgba(255,205,210,.7)';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+    mark(cx,cy,'contact');});
+  vignette(.5,'20,2,5');caption(t,17.4,'Red','단일 파장 | 탄력·리프팅 케어',{tagColor:'#ff8a90'});
+}
+const CON8=[425,826];
+function cut7insert(t){
+  const c=cam(lerp(1.2,1.26,eo(seg(t,19.5,20.45))),470,880);plate('p08',c);
+  within(c,()=>{redLines(t,CON8[0],CON8[1],1500,.7);ctx.save();ctx.globalCompositeOperation='lighter';glow(CON8[0],CON8[1],150,C.line,.25);ctx.restore();mark(...CON8,'contact');});
+  ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgba(255,150,155,.6)';ctx.fillRect(0,0,W,H);ctx.restore();
+  vignette(.6,'20,2,5');caption(t,17.4,'Red','단일 파장 | 탄력·리프팅 케어',{tagColor:'#ff8a90'});
+}
+// CUT 8 22–25 DUAL-MODE HERO: slow dolly in, blue/red light drifting apart, green underglow
+function cut8(t){
+  const u=eo(seg(t,21.95,25)), c=cam(lerp(1.0,1.06,u),540,lerp(1130,1170,u));plate('p09',c);
+  within(c,()=>{ctx.save();ctx.globalCompositeOperation='lighter';const d=u*70;
+    glow(60-d,1100,440,C.wave,.24);glow(1020+d,1100,440,C.line,.24);glow(540,1610,240,C.green,.3);ctx.restore();});
+  caption(t,22.3,'One touch','RED ↔ BLUE, 원터치 전환');
+}
+// CUT 9 25–27 MODEL + PRODUCT: push-in from her face to the product (1.0→1.12), calm X beams behind
+function cut9(t){
+  const u=eo(seg(t,24.95,27)), c=cam(lerp(1.0,1.12,u),lerp(660,250,u),lerp(850,930,u));plate('p10',c);
+  // calm X of red / blue / green beams, keyed so they sit behind her and the product
+  const o=beamCanvas.getContext('2d');o.setTransform(1,0,0,1,0,0);o.clearRect(0,0,W,H);o.globalCompositeOperation='source-over';
+  o.save();o.translate(c.sx,c.sy);o.scale(c.s,c.s);o.translate(-c.fx,-c.fy);
+  const a=eo(seg(t,25,25.6));
+  [[C.line,-.6,.55],[C.wave,.6,.55],[C.green,0,.3]].forEach(([col,r,k])=>{o.save();o.translate(560,820);o.rotate(r);
+    const g=o.createLinearGradient(-50,0,50,0);g.addColorStop(0,hexA(col,0));g.addColorStop(.5,hexA(col,k*a));g.addColorStop(1,hexA(col,0));
+    o.fillStyle=g;o.fillRect(-50,-1500,100,3000);o.fillStyle=hexA(col,.85*k*a);o.fillRect(-1.2,-1500,2.4,3000);o.restore();});
+  o.globalCompositeOperation='destination-in';o.drawImage(IMG.p10_bgmask,0,0);o.restore();
+  ctx.save();ctx.globalCompositeOperation='screen';ctx.drawImage(beamCanvas,0,0);ctx.restore();
+}
+// CUT 10 27–30 ENDING PACKSHOT
+function cut10(t){
+  ctx.fillStyle=C.black;ctx.fillRect(0,0,W,H);
+  const r=t0=>{const p=eo(seg(t,t0,t0+.6));return [p,(1-p)*30];};
+  let [a,dy]=r(27.35);ctx.save();ctx.globalAlpha=a;ctx.translate(0,dy+60);ctx.drawImage(IMG.p11,0,0);ctx.restore();
+  ctx.save();ctx.globalAlpha=a;ctx.globalCompositeOperation='lighter';const lg=ctx.createLinearGradient(120,0,960,0);
+  lg.addColorStop(0,'rgba(143,224,42,0)');lg.addColorStop(.5,hexA(C.green,.7));lg.addColorStop(1,'rgba(143,224,42,0)');ctx.fillStyle=lg;ctx.fillRect(120,1585+60+dy,840,2);ctx.restore();
+  const txt=(t0,font,ls,col,s,y)=>{const [p,d]=r(t0);ctx.save();ctx.globalAlpha=p;ctx.translate(0,d);ctx.font=font;ctx.letterSpacing=ls;ctx.textAlign='center';ctx.fillStyle=col;ctx.fillText(s,540,y);ctx.restore();};
+  txt(27.15,'800 40px Syne','3px','#d9dcdf','duflow',380);           // placeholder: composite real logo
+  txt(27.75,'800 150px Syne','6px','#F2F3F4','DURIT',560);           // placeholder: composite real wordmark
+  txt(28.10,'600 32px NotoKR','9px',C.gold,'YOUR SKIN COACH',630);
+  const [p,d]=r(28.45);ctx.save();ctx.globalAlpha=p;ctx.translate(0,d);ctx.font='600 26px NotoKR';ctx.letterSpacing='6px';ctx.textAlign='center';ctx.fillStyle='#c9cdd1';
+  const s='2025 RED DOT DESIGN AWARD',w=ctx.measureText(s).width;ctx.fillText(s,555,712);ctx.beginPath();ctx.arc(555-w/2-16,703,10,0,7);ctx.fillStyle='#E3001B';ctx.fill();ctx.restore();
+}
+
+const beamCanvas=document.createElement('canvas');beamCanvas.width=W;beamCanvas.height=H;
+const CUTS=[[0,3,cut1],[3,6,cut2],[6,8,cut3],[8,10,cut4],[10,15,cut5],[15,17,cut6],[17,22,cut7],[22,25,cut8],[25,27,cut9],[27,30.01,cut10]];
+function render(t){ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.letterSpacing='0px';
+  for(const [a,b,f] of CUTS)if(t>=a&&t<b){f(t);break;}}
+window.render=render;
+window.ready=Promise.all([...loads,fetch('clips/manifest.json').then(r=>r.ok?r.json():{}).then(j=>CLIPS=j).catch(()=>{}),document.fonts.load('800 40px Syne'),document.fonts.load('700 40px NotoKR'),document.fonts.load('600 40px NotoKR')]).then(()=>true);
+</script></body></html>

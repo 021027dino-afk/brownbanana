@@ -17,7 +17,7 @@ const path = require('path');
   const browser = await chromium.launch({ args: ['--allow-file-access-from-files'] });
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   page.on('pageerror', e => console.error('page error:', e.message));
-  await page.goto('file://' + path.resolve(__dirname, '../spot.html'));
+  await page.goto('file://' + path.resolve(__dirname, '../' + (process.env.PAGE || 'spot.html')));
   await page.evaluate(() => window.ready);
   for (let i = 0; i < frames; i++) {
     const b64 = await page.evaluate(t => { window.render(t); return document.getElementById('c').toDataURL('image/jpeg', 0.95).split(',')[1]; }, i / fps);

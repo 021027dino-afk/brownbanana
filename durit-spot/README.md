@@ -36,3 +36,14 @@ A frame-exact animatic of the DURIT spot: 1080×1920, 30 fps, 120 BPM grid, with
 | 10 Packshot | 27–30 | Black | Rises at 27.15 / 27.35 / 27.75 / 28.10 / 28.45; chime 27.25 |
 
 Captions sit at y 390–560 px, x ≥ 90 px, ≥ 140 px from the right edge. None fall in the bottom 320 px.
+
+## v2: built on the reference stills
+
+`out/DURIT_30s_v2_photo.mp4` is rendered from `spot2.html` on the 11 reference stills in `plates/`, which were cleaned by `scripts/prep_plates.py` (letterbox removal, product keys, a blue-world version of the switch shot, a background key for the X beams). The timing, captions and audio match v1.
+
+```bash
+python3 scripts/prep_plates.py <folder with 1.webp … 11.webp>
+PAGE=spot2.html node scripts/render.js out/DURIT_30s_v2_photo.mp4 out/durit_audio.wav 30
+```
+
+Motion comes from camera moves plus light passes on still plates: ring light, LED on/off, the press ring, ripples, the streak wipe, red lines and the jaw trace, beams and glows. The turntable in CUT 2, the pick-up in CUT 3 and the head glides in CUT 5 and 7 need real footage or image-to-video plates; slow dollies stand in for them for now.

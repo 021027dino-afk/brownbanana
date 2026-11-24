@@ -6,7 +6,7 @@ const path = require('path');
   const p = await b.newPage({ viewport: { width: 1080, height: 1920 } });
   p.on('console', m => console.log('console:', m.text()));
   p.on('pageerror', e => console.log('ERR:', e.message));
-  await p.goto('file://' + path.resolve(__dirname, '../spot.html'));
+  await p.goto('file://' + path.resolve(__dirname, '../' + (process.env.PAGE || 'spot.html')) + (process.env.QS || ''));
   await p.evaluate(() => window.ready);
   for (const t of times) {
     await p.evaluate(t => window.render(t), parseFloat(t));

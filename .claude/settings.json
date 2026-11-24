@@ -28,7 +28,8 @@
     "rea": {
       "source": {
         "source": "github",
-        "repo": "morluto/rea"
+        "repo": "morluto/rea",
+        "ref": "6d408c048006c54f7e4ca371e78caee3f0d6c43a"
       }
     }
   },

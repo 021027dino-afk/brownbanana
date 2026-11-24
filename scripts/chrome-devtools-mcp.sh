@@ -4,7 +4,7 @@
 # 클라우드 세션(Chromium이 /opt/pw-browsers에 있는 환경): 헤드리스 + 프록시 설정으로 실행.
 set -euo pipefail
 
-args=(-y chrome-devtools-mcp@latest)
+args=(-y chrome-devtools-mcp@1.13.0)  # 검증한 버전으로 고정. 올릴 때 여기만 바꾸면 됨
 
 if [[ -x /opt/pw-browsers/chromium ]]; then
   args+=(--headless --isolated --executablePath /opt/pw-browsers/chromium
